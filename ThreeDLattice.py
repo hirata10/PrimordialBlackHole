@@ -3,65 +3,102 @@ import numpy.linalg
 import scipy.linalg
 
 
-def ThreeDLattice(nx,ny,nz,diagterm,frontterm,upterm,leftterm):
+def ThreeDLattice(nx,ny,nz,m,omega,Ex,Ey,Ez):
 
 
-    #Takes size input and unique terms and returns total matrix, as well as eigenvalues and eigenvectors for the stationary solution
+    #Takes size input, m, omega, and lattice spacing and returns total matrix, as well as eigenvalues and eigenvectors 
     
     
-    #idea: d_x will give right and left values -/+1 cell away from diagional on N_x by N_x matrix
-    #d_y will give up and down values -/+ N_x entries away from diagional on (N_x*N_y) by (N_x*N_y) matrix
-    #d_z will give front and back values -/+ N_x*N_y entries away from diagional on (N_x*N_y*N_z) by (N_x*N_y*N_z) matrix
+    #idea: d_x will give right and left values -/+4 cell away from diagional on 4N_x by 4N_x matrix
+    #d_y will give up and down values -/+ 4N_x entries away from diagional on 4(N_x*N_y) by 4(N_x*N_y) matrix
+    #d_z will give front and back values -/+ 4N_x*N_y entries away from diagional on 4(N_x*N_y*N_z) by 4(N_x*N_y*N_z) matrix
     
-    #Total matrix is intexed as zyx where x is looped over, and then y is looped over, and then z
+    #Total matrix is indexed as zyxa where a (dirac index [0123]) is looped over, x is looped over, then y is looped over, and then z
     
     #for dimensions (n by m by w)
-    #first row would look like [000, 00x1, ..., 00x_n, 0(y_1)0, 0(y_1)x_1, ... 0(y_1)x_n, ... 0(y_m)x_n, (z_1)00, (z_1)0x_1, ... (z_1)y_m(x_n), ..., z_w(y_m)x_n] 
+    #first row would look like [0000,0001, 0002,0003 00(x_1)0, ..., 00(x_n)3, 0(y_1)00,... 0(y_1)(x_1)0, ... 0(y_1)(x_n)3, ... 0(y_m)x_n, (z_1)00, (z_1)0x_1, ... (z_1)y_m(x_n), ..., z_w(y_m)(x_n)3] 
+
     
-    #diagterms = 1. 
+    dt = complex(omega,0)*np.diag([complex(0,1),complex(0,1),complex(0,-1),complex(0,-1)]) - m*np.identity(4)
+    
     #nx = 3
     #ny = 3 
     #nz = 4
 
-    #frontterm = 2. 
-    backterm = -frontterm
+    bt =  np.array([[0,0,1.,0],[0,0,0,-1.],[1.,0,0,0],[0,-1.,0,0]])/(2*Ez)
+    ft =  np.array( [[0,0,-1.,0],[0,0,0,1.],[-1.,0,0,0],[0,1.,0,0]])/(2*Ez)
 
-    #upterm = 5.
-    downterm = -downterm
+    ut  = np.array([[0,0,0,complex(0,-1)],[0,0,complex(0,1),0],[0,complex(0,-1),0,0],[complex(0,1),0,0,0]])/(2*Ey)
+    dot = np.array([[0,0,0,complex(0,1)],[0,0,complex(0,-1),0],[0,complex(0,1),0,0],[complex(0,-1),0,0,0]])/(2*Ey)
+    
+    
+    lt = np.array([[0,0,0,-1],[0,0,-1,0],[0,-1,0,0],[-1,0,0,0]])/(2*Ex)
+    rt = np.array([[0,0,0,1],[0,0,1,0],[0,1,0,0],[1,0,0,0]])/(2*Ex)
+    
+    
+    a = nx*ny*nz
+    ai = 0 
+    diag = np.array(dt)
+    front = np.array(ft)
+    back = np.array(bt)
+    while (ai<a-1) ==True:
+        diag = scipy.linalg.block_diag(diag,dt)
+        front = scipy.linalg.block_diag(front,ft)
+        back = scipy.linalg.block_diag(back,bt)
+        ai+=1
 
-    #leftterm = 7.
-    rightterm=-leftterm
+    front = np.roll(front, 4*nx*ny,axis=1)
+    back = np.roll(back, -4*nx*ny,axis=1)
+    
+    
+    a = nx*ny
+    ai = 0 
+    up = np.array(ut)
+    down = np.array(dot)
+    while (ai<a-1) ==True:
+        up = scipy.linalg.block_diag(up,ut)
+        down = scipy.linalg.block_diag(down,dot)
+        ai+=1
 
-    diag = diagterm*np.identity(nx*ny*nz)
+    up = np.roll(up,4*nx,axis=1)
+    down = np.roll(down,-4*nx,axis=1)
+    
+    
+    a = nz
+    ai = 0 
+    uppertry = np.array(up)
+    downtry = np.array(down)
+    while (ai<a-1) ==True:
+        uppertry = scipy.linalg.block_diag(uppertry,up)
+        downtry = scipy.linalg.block_diag(downtry,down)
+        ai+=1
 
-    front = frontterm*np.identity(nx*ny*nz)
-    front = np.roll(front, nx*ny,axis=1)
+    a = nx
+    ai = 0 
+    left = np.array(lt)
+    right = np.array(rt)
+    while (ai<a-1) ==True:
+        left = scipy.linalg.block_diag(left,lt)
+        right = scipy.linalg.block_diag(right,rt)
+        ai+=1
 
-    back = backterm*np.identity(nx*ny*nz)
-    back = np.roll(back, -nx*ny,axis=1)
+    left = np.roll(left,-4,axis=1)
+    right = np.roll(right,4,axis=1)
+    
+    
+    a = ny*nz
+    ai = 0 
+    lefttry = np.array(left)
+    righttry = np.array(right)
+    while (ai<a-1) ==True:
+        lefttry = scipy.linalg.block_diag(lefttry,left)
+        righttry = scipy.linalg.block_diag(righttry,right)
+        ai+=1
 
-    up = upterm*np.identity(nx*ny)
-    up = np.roll(up,nx,axis=1)
-    #need to have nz copies of 'up' in the following function
-    uppertry = scipy.linalg.block_diag(up,up,up,up)
-
-    down = downterm*np.identity(nx*ny)
-    down = np.roll(down,-nx,axis=1)
-    #need to have nz copies of 'down' in the following function
-    downtry = scipy.linalg.block_diag(down,down,down,down)
-
-    left = leftterm*np.identity(nx)
-    left = np.roll(left,-1, axis=1)
-    #need to have nz*ny copies of 'left' in the following function
-    lefttry = scipy.linalg.block_diag(left,left,left,left,left,left,left,left,left,left,left,left)
-
-    right = rightterm*np.identity(nx)
-    right = np.roll(right,1,axis=1)
-    #need to have nz*ny copies of 'right' in the following function
-    righttry = scipy.linalg.block_diag(right,right,right,right,right,right,right,right,right,right,right,right)
-
-
-    total = diag + front+back+uppertry+downtry+lefttry+righttry
+    
+    
+    
+    total = diag+front+back+uppertry+downtry+lefttry+righttry
 
 
     eigenval,eigenvect = np.linalg.eig(total)
