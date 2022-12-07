@@ -3,10 +3,12 @@ import numpy.linalg
 import scipy.linalg
 
 
-def ThreeDLattice(nx,ny,nz,m,omega,Ex,Ey,Ez):
+def ThreeDLattice(nx,ny,nz,m,Ex,Ey,Ez):
 
 
-    #Takes size input, m, omega, and lattice spacing and returns total matrix, as well as eigenvalues and eigenvectors 
+    #Takes size input, m, and lattice spacing and returns total matrix, as well as eigenvalues and eigenvectors 
+    #WITHOUT WILSON LOOP CORRECTION!!
+    
     
     
     #idea: d_x will give right and left values -/+4 cell away from diagional on 4N_x by 4N_x matrix
@@ -19,7 +21,8 @@ def ThreeDLattice(nx,ny,nz,m,omega,Ex,Ey,Ez):
     #first row would look like [0000,0001, 0002,0003 00(x_1)0, ..., 00(x_n)3, 0(y_1)00,... 0(y_1)(x_1)0, ... 0(y_1)(x_n)3, ... 0(y_m)x_n, (z_1)00, (z_1)0x_1, ... (z_1)y_m(x_n), ..., z_w(y_m)(x_n)3] 
 
     
-    dt = complex(omega,0)*np.diag([complex(0,1),complex(0,1),complex(0,-1),complex(0,-1)]) - m*np.identity(4)
+    #dt = complex(omega,0)*np.diag([complex(0,1),complex(0,1),complex(0,-1),complex(0,-1)]) - m*np.identity(4)
+    dt = -m*np.identity(4)
     
     #nx = 3
     #ny = 3 
@@ -41,10 +44,14 @@ def ThreeDLattice(nx,ny,nz,m,omega,Ex,Ey,Ez):
     diag = np.array(dt)
     front = np.array(ft)
     back = np.array(bt)
+    
+    beta = np.array([[-1,0,0,0],[0,-1,0,0],[0,0,1,0],[0,0,0,1]])
+    beta_blocks = np.array(beta)
     while (ai<a-1) ==True:
         diag = scipy.linalg.block_diag(diag,dt)
         front = scipy.linalg.block_diag(front,ft)
         back = scipy.linalg.block_diag(back,bt)
+        beta_blocks = scipy.linalg.block_diag(beta_blocks, beta)
         ai+=1
 
     front = np.roll(front, 4*nx*ny,axis=1)
@@ -96,14 +103,11 @@ def ThreeDLattice(nx,ny,nz,m,omega,Ex,Ey,Ez):
         ai+=1
 
     
-    
-    
     total = diag+front+back+uppertry+downtry+lefttry+righttry
-
-
-    eigenval,eigenvect = np.linalg.eig(total)
     
-    return total,eigenval,eigenvect
+    beta_total = np.dot(beta_blocks,total)
+    #checked and this is hermitian which is great so now can use .eigh
 
-
-
+    eigenval,eigenvect = np.linalg.eigh(total)
+    
+    return beta_total,eigenval,eigenvect
