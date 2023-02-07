@@ -16,6 +16,7 @@ from sympy.physics.wigner import wigner_3j
 import module1 as m1 # module1 contains the function to convert r_star to r\n",
 
 import cmath
+from astropy.io import fits
  
 
 
@@ -128,17 +129,26 @@ class ElectronWaveFunction:
         #we need to specify the r_points for initial and final so that they match the F and G that come out! 
         
         #Define initial values for F and G
+        if self.h>self.mu:
         
-        if up == True: #for up scattering states
-            F = np.complex(np.sqrt(self.h + self.mu), 0)
-            G = np.complex(0, -np.sqrt(self.h - self.mu))
-            
-        elif up == False: ###NOTE: this would be for the "in" funtions
-            F = np.complex(1,0) ###NOTE: These are the eigenvalues for r_star -> -(infinity) 
-            G = np.complex(0,1)
+            if up == True: #for up scattering states
+                F = np.complex(np.sqrt(self.h + self.mu), 0)
+                G = np.complex(0, -np.sqrt(self.h - self.mu))
+
+            elif up == False: ###NOTE: this would be for the "in" funtions
+                F = np.complex(1,0) ###NOTE: These are the eigenvalues for r_star -> -(infinity) 
+                G = np.complex(0,1)
             
             #r_points = np.arange(r_initial, r_final, N)
-        
+        if self.h<self.mu:
+            
+            if up == True:
+                F = np.complex((self.h+self.mu)/np.sqrt(self.mu**2 -self.h**2),0)
+                G = np.complex(1.,0)
+                r_points = np.linspace(np.maximum(r_initial,r_final),np.minimum(r_initial, r_final), N) 
+            elif up == False:
+                F = np.complex(0,0)
+                G = np.complex(0,0)
 
 
         #Arrays to keep track of r, F and G points:
@@ -169,38 +179,49 @@ class ElectronWaveFunction:
             
         #want to normalize the last points of things 
         
-        if up == True:
-            # want F and g to match 41 in the paper 
-            #A is the normalization here 
-            
-            # want this for rstar at negative infinity to get this
-            # rstar for up is from positive infinity to negative infinity so rstar negative infinity should be the last point
-            A = 2 * np.sqrt(self.h) * np.exp(np.complex(0,1)*self.h*r_points[-1])/ (F_points[-1]+ np.complex(0,1)*G_points[-1])
-            print(A)
+        if self.h>self.mu: 
+            if up == True:
+                # want F and g to match 41 in the paper 
+                #A is the normalization here 
 
-            #A* arijit's F and G = F_up and G_up from the paper
-            #use this to isolate T! then do a similar thing for up==False 
-            print("fpoints0 is "+str(F_points[0]))
-            F_points = A*np.array(F_points)
-            G_points = A*np.array(G_points)
-            print("fpoints0 normalized is "+str(F_points[0]))
-            
-        if up ==False:
-            
-            zeta = self.mu**2 * self.M/np.sqrt(self.h**2 -self.mu**2)
-            
-            #need a normalization here 
-            
-            #this assumes that r_initial and r_final are chosen so the integrater starts at r_points[0] and ends at r_points[N]
-            #therefore, you have to pass the initial conditions appropriately for this 
-            #ie rstar = infinity is the last point 
-            
-            B = 2*self.h*np.sqrt(self.v)*np.exp(np.complex(0,-1)*zeta*np.log(r_points[-1]/2/self.M))*np.exp(np.complex(0,-1)*np.sqrt(self.h**2-self.mu**2)*r_points[-1])/(np.sqrt(self.h-self.mu)*F_points[-1] -np.complex(0,1)*np.sqrt(self.h+self.mu)*G_points[-1])
-            
-            print(B)
-            F_points = B*np.array(F_points)
-            G_points = B*np.array(G_points)
-            
+                # want this for rstar at negative infinity to get this
+                # rstar for up is from positive infinity to negative infinity so rstar negative infinity should be the last point
+                A = 2 * np.sqrt(self.h) * np.exp(np.complex(0,1)*self.h*r_points[-1])/ (F_points[-1]+ np.complex(0,1)*G_points[-1])
+                print(A)
+
+                #A* arijit's F and G = F_up and G_up from the paper
+                #use this to isolate T! then do a similar thing for up==False 
+                print("fpoints0 is "+str(F_points[0]))
+                F_points = A*np.array(F_points)
+                G_points = A*np.array(G_points)
+                print("fpoints0 normalized is "+str(F_points[0]))
+
+            if up ==False:
+
+                zeta = self.mu**2 * self.M/np.sqrt(self.h**2 -self.mu**2)
+
+                #need a normalization here 
+
+                #this assumes that r_initial and r_final are chosen so the integrater starts at r_points[0] and ends at r_points[N]
+                #therefore, you have to pass the initial conditions appropriately for this 
+                #ie rstar = infinity is the last point 
+
+                B = 2*self.h*np.sqrt(self.v)*np.exp(np.complex(0,-1)*zeta*np.log(r_points[-1]/2/self.M))*np.exp(np.complex(0,-1)*np.sqrt(self.h**2-self.mu**2)*r_points[-1])/(np.sqrt(self.h-self.mu)*F_points[-1] -np.complex(0,1)*np.sqrt(self.h+self.mu)*G_points[-1])
+
+                print(B)
+                F_points = B*np.array(F_points)
+                G_points = B*np.array(G_points)
+                
+        if self.h<self.mu:
+            if up ==True:
+                
+                print(F_points[0])
+                A = 2*np.complex(0,-1)*np.sqrt(self.h)*np.exp(np.complex(0,1)*self.h*r_points[-1])/(np.complex(0,-1)*F_points[-1]+G_points[-1])
+                print(A)
+                F_points = A*np.array(F_points)
+                G_points = A*np.array(G_points)
+            print(F_points[0])
+                
         return (r_points, F_points, G_points)
     
     
@@ -210,37 +231,46 @@ class ElectronWaveFunction:
     def get_R_and_T_coeff(self,r_up,F_points_up,G_points_up,r_in,F_points_in,G_points_in):
         
         #assumes the inputs to this are already normalized by A and B above 
+        if self.h<self.mu:
+            R_half_k_h=1.
+            T_half_k_h =0. 
+            
+            delta = np.complex(0,-1)*.5*np.log((np.complex(0,1)*F_points_up[-1]+G_points_up[-1])/(2*np.complex(0,1)*np.sqrt(self.h)*np.exp(np.complex(0,-1)*self.h*r_up[-1])))
+            #match delta to small solution! 
+            print(delta)
         
-        zeta = self.mu**2 * self.M/np.sqrt(self.h**2 -self.mu**2)
-        
-        #want F_points_up as rstar goes to infinity and up has rstar starting at positive infinity and going to negative 
-        a1=G_points_up[0]*np.sqrt(self.v)
-        b1=np.exp(np.complex(0,-1)*zeta*np.log(r_up[0]/2/self.M))
-        c1=np.exp(np.complex(0,-1)*np.sqrt(self.h**2 -self.mu**2)*r_up[0])
-        d1=1/(np.complex(0,-1)*np.sqrt(self.h-self.mu))
-        
-        print(a1,b1,c1,d1)
-        print(self.v,zeta)
-        
-        
-        T_half_k_h = a1*b1*c1*d1
-        
-        
-        
-        
-        #r_in integrates from negative infinity to positive infinity so that if we want rstar = infinity, that is the last argument 
-        
-        a1 = (np.sqrt(self.h-self.mu)*F_points_in[-1] +np.complex(0,1)*np.sqrt(self.h+self.mu)*G_points_in[-1])
-        b1=np.exp(np.complex(0,-1)*zeta*np.log(r_in[-1]/2/self.M))
-        c1=np.exp(np.complex(0,-1)*np.sqrt(self.h**2 - self.mu**2)*r_in[-1])
-        d1=1/2/self.h/np.sqrt(self.v)
-        #print(a1,b1,c1,d1)
-        #print(a1*b1,c1*d1)
-        #print(a1*b1*c1,d1)
-        
-        R_half_k_h = a1*b1*c1*d1
-        
-        return R_half_k_h,T_half_k_h
+        if self.h>self.mu:
+            delta = 0 
+            zeta = self.mu**2 * self.M/np.sqrt(self.h**2 -self.mu**2)
+
+            #want F_points_up as rstar goes to infinity and up has rstar starting at positive infinity and going to negative 
+            a1=G_points_up[0]*np.sqrt(self.v)
+            b1=np.exp(np.complex(0,-1)*zeta*np.log(r_up[0]/2/self.M))
+            c1=np.exp(np.complex(0,-1)*np.sqrt(self.h**2 -self.mu**2)*r_up[0])
+            d1=1/(np.complex(0,-1)*np.sqrt(self.h-self.mu))
+
+            print(a1,b1,c1,d1)
+            print(self.v,zeta)
+
+
+            T_half_k_h = a1*b1*c1*d1
+
+
+
+
+            #r_in integrates from negative infinity to positive infinity so that if we want rstar = infinity, that is the last argument 
+
+            a1 = (np.sqrt(self.h-self.mu)*F_points_in[-1] +np.complex(0,1)*np.sqrt(self.h+self.mu)*G_points_in[-1])
+            b1=np.exp(np.complex(0,-1)*zeta*np.log(r_in[-1]/2/self.M))
+            c1=np.exp(np.complex(0,-1)*np.sqrt(self.h**2 - self.mu**2)*r_in[-1])
+            d1=1/2/self.h/np.sqrt(self.v)
+            #print(a1,b1,c1,d1)
+            #print(a1*b1,c1*d1)
+            #print(a1*b1*c1,d1)
+
+            R_half_k_h = a1*b1*c1*d1
+
+        return R_half_k_h,T_half_k_h,delta
 
 
 class PhotonWaveFunction:
@@ -307,7 +337,7 @@ class PhotonWaveFunction:
             z_points.append(z_vector[1])
             
             prime = self.diff_eq(r, z_vector)
-            f_points_prime.append(prime[0])
+            #f_points_prime.append(prime[0])
             
             k1 = step_size * self.diff_eq(r, z_vector)
 
@@ -330,7 +360,7 @@ class PhotonWaveFunction:
             
             f_points = b*np.array(f_points)
             z_points = b*np.array(z_points)
-            f_points_prime = b*np.array(f_points_prime)
+            #f_points_prime = b*np.array(f_points_prime)
             
             print("fpoints0 renormalized is " + str(f_points[0]))
         
@@ -346,7 +376,7 @@ class PhotonWaveFunction:
             
             f_points = a*np.array(f_points)
             z_points = a*np.array(z_points)
-            f_points_prime = a*np.array(f_points_prime)
+            #f_points_prime = a*np.array(f_points_prime)
             
             print("fpoints0 renormalized is " + str(f_points[0]))
     
@@ -373,13 +403,6 @@ class PhotonWaveFunction:
         return R,T
 
 
-    
-    
-    
-    
-    
-    
-    
 class IfunctionsNoM:
     
     def __init__(self,X,k,X_prime,k_prime,X_gamma,l,parity,h,h_prime,omega,M,n):
@@ -401,14 +424,20 @@ class IfunctionsNoM:
         
         self.j_prime = (np.abs(k_prime) - 1/2)
         
-        self.coeff_no_m_even = complex(0,-1)/(np.sqrt(4*h*h_prime)) * self.Delta_no_m(k,k_prime,l)
+        self.coeff_no_m_even = (complex(0,-1)/(np.sqrt(4*h*h_prime))) * self.Delta_no_m(k,k_prime,l)
         #self.coeff_m_even = ((-1)**(m+.5))*float(wigner_3j(self.j,self.j_prime,l,-m,m_prime,m_gamma))
         
-        self.coeff_no_m_odd = -1./np.sqrt(4*h*h_prime) * self.Pi_no_m(k,k_prime,l)
-        self.step_size_for_inte = int(n*240000)
+        self.coeff_no_m_odd = -(1./np.sqrt(4*h*h_prime)) * self.Pi_no_m(k,k_prime,l)
+        #self.step_size_for_inte = int(n*240000)
+        
+        
+        self.omega_index = round(self.omega*100/(8*np.pi*self.M) -1)
+        self.h_index = round(self.h*100/(8*np.pi*self.M) -1)
+        self.h_prime_index = round(self.h_prime*100/(8*np.pi*self.M) -1)
     
         #print(self.coeff_no_m_odd)
    
+    
     def Delta_no_m(self,k,k_prime,l):
         s=0
         s_prime=0
@@ -422,11 +451,8 @@ class IfunctionsNoM:
         
         j_prime = (np.abs(k_prime) - 1/2)
         
-        
-        
         threej=float(wigner_3j(j,j_prime,l,1/2,-1/2,0))
         #print(threej)
-        
         
         x=(1/2) * np.sqrt((2*j+1)*(2*j_prime +1)*(2*l+1)/(4*np.pi))*threej* (1 + s*s_prime*(-1)**(j-j_prime+l))
 
@@ -464,7 +490,7 @@ class IfunctionsNoM:
         
         
         nu = 1.
-        mu = 1.e-23 
+        mu = 4.1796514508e-23
         lam = 1.
         GC = 1.
         c = 1.
@@ -510,27 +536,71 @@ class IfunctionsNoM:
             
         
         #might pass this in instead. will ask 
-        try0 = ElectronWaveFunction(nu, h, k, mu, M, lam, GC, c, tol)
-        r_points,F_points_xkh, G_points_xkh = try0.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue)
+        #try0 = ElectronWaveFunction(nu, h, k, mu, M, lam, GC, c, tol)
+        #r_points,F_points_xkh, G_points_xkh = try0.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue)
         
-        try1 = ElectronWaveFunction(nu, h_prime, -k_prime, mu, M, lam, GC, c, tol)
-        r_points_prime,F_points_xminkh_prime, G_points_xminkh_prime = try1.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue_Xprime)
+        #try1 = ElectronWaveFunction(nu, h_prime, -k_prime, mu, M, lam, GC, c, tol)
+       # r_points_prime,F_points_xminkh_prime, G_points_xminkh_prime = try1.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue_Xprime)
         
         
-        phot_try0= PhotonWaveFunction(M,omega,l,tol)
-        r_points_gamma, f_points_gammalomega, z_points_gammalomega, f_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, self.step_size_for_inte, up = uptrue_Xgamma)
+        #phot_try0= PhotonWaveFunction(M,omega,l,tol)
+        #r_points_gamma, f_points_gammalomega, z_points_gammalomega, f_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, self.step_size_for_inte, up = uptrue_Xgamma)
         
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
         
+        #want to write a script that shows intermediate results, can put in plots about transmission coefficients 
+        
+        
+        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        
+        hdu = fits.open(direcPhoton+str(l)+'.fits')
+        
+        r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
+        if uptrue_Xgamma == True: 
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_up')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
+        else: 
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
+         
+        direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
+        if k>0:
+            hdu = fits.open(direcElectron+str(k)+'ExtendedOmega.fits')
+        else:
+            hdu = fits.open(direcElectron+'min'+str(k)+'ExtendedOmega.fits')
+        
+        r_points = hdu[self.h_index].data.field('rpoints_up')
+        if uptrue == True: 
+            F_points_xkh = hdu[self.h_index].data.field('F_points_up')
+            G_points_xkh = hdu[self.h_index].data.field('G_points_up')
+        else: 
+            F_points_xkh = hdu[self.h_index].data.field('F_points_in')
+            G_points_xkh = hdu[self.h_index].data.field('G_points_in')
+        if k_prime<0:
+            hdu = fits.open(direcElectron+str(k_prime)+'ExtendedOmega.fits')
+        else:
+            hdu = fits.open(direcElectron+'min'+str(k_prime)+'ExtendedOmega.fits')
+        
+        #r_points = hdu[self.h_index+1]['rpoints_up']
+        if uptrue_Xprime == True: 
+            F_points_xminkh_prime = hdu[self.h_prime_index].data.field('F_points_up')
+            G_points_xminkh_prime = hdu[self.h_prime_index].data.field('G_points_up')
+        else: 
+            F_points_xminkh_prime = hdu[self.h_prime_index].data.field('F_points_in')
+            G_points_xminkh_prime = hdu[self.h_prime_index].data.field('G_points_in')
+        
+        #need analytic continuation of wavefunctions! 
+        #can just add the analytic piece at the end! so need to do that also
+            
         gstar_xkh = np.conjugate(np.array(G_points_xkh))
         gstar_xprime_minkprime_hprime = np.conjugate(np.array(G_points_xminkh_prime))
         
         fstar_xkh = np.conjugate(np.array(F_points_xkh))
         fstar_xprime_minkprime_hprime = np.conjugate(np.array(F_points_xminkh_prime))
             
-        psi_gammalomega = np.array(f_points_gammalomega)
-        psi_gammalomega_prime = np.array(z_points_gammalomega)
+        #psi_gammalomega = np.array(f_points_gammalomega)
+        #psi_gammalomega_prime = np.array(z_points_gammalomega)
         
         r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart_top = (1-2*M/r)/(r**2*np.sqrt(2*omega**3))
@@ -569,7 +639,7 @@ class IfunctionsNoM:
         
         
         nu = 1.
-        mu = 1.e-23 
+        mu = 4.1796514508e-23 
         lam = 1.
         GC = 1.
         c = 1.
@@ -611,18 +681,61 @@ class IfunctionsNoM:
             
         
         #might pass this in instead. will ask 
+        
+        """
         try0 = ElectronWaveFunction(nu, h, -k, mu, M, lam, GC, c, tol)
         r_points,F_points_xminkh, G_points_xminkh = try0.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue)
         
         try1 = ElectronWaveFunction(nu, h_prime, k_prime, mu, M, lam, GC, c, tol)
         r_points_prime,F_points_xkh_prime, G_points_xkh_prime = try1.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue_Xprime)
         
-        
+       
         phot_try0= PhotonWaveFunction(M,omega,l,tol)
         r_points_gamma, f_points_gammalomega, z_points_gammalomega, f_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, self.step_size_for_inte, up = uptrue_Xgamma)
         
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
+        """
+        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        
+        hdu = fits.open(direcPhoton+str(l)+'ExtendedOmega.fits')
+        
+        r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
+        if uptrue_Xgamma == True: 
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_up')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
+        else: 
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')
+            
+        direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
+        if k<0:
+            hdu = fits.open(direcElectron+str(k)+'ExtendedOmega.fits')
+        else:
+            hdu = fits.open(direcElectron+'min'+str(k)+'ExtendedOmega.fits')
+        
+        r_points = hdu[self.h_index].data.field('rpoints_up')
+        if uptrue == True: 
+            F_points_xminkh = hdu[self.h_index].data.field('F_points_up')
+            G_points_xminkh = hdu[self.h_index].data.field('G_points_up')
+        else: 
+            F_points_xminkh = hdu[self.h_index].data.field('F_points_in')
+            G_points_xminkh = hdu[self.h_index].data.field('G_points_in')
+            
+        if k_prime>0:
+            hdu = fits.open(direcElectron+str(k_prime)+'ExtendedOmega.fits')
+        else:
+            hdu = fits.open(direcElectron+'min'+str(k_prime)+'ExtendedOmega.fits')
+        
+        #r_points = hdu[self.h_index+1]['rpoints_up']
+        if uptrue_Xprime == True: 
+            F_points_xkh_prime = hdu[self.h_prime_index].data.field('F_points_up')
+            G_points_xkh_prime = hdu[self.h_prime_index].data.field('G_points_up')
+        else: 
+            F_points_xkh_prime = hdu[self.h_prime_index].data.field('F_points_in')
+            G_points_xkh_prime = hdu[self.h_prime_index].data.field('G)points_in')
+        
+        
         
         g_xminkh = np.array(G_points_xminkh)
         g_xprime_kprime_hprime = np.array(G_points_xkh_prime)
@@ -630,8 +743,8 @@ class IfunctionsNoM:
         f_xminkh = np.array(F_points_xminkh)
         f_xprime_kprime_hprime = np.array(F_points_xkh_prime)
             
-        psi_gammalomega = np.array(f_points_gammalomega)
-        psi_gammalomega_prime = np.array(z_points_gammalomega_)
+        #psi_gammalomega = np.array(f_points_gammalomega)
+        #psi_gammalomega_prime = np.array(z_points_gammalomega_)
         
         r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart_top = (1-2*M/r)/(r**2*np.sqrt(2*omega**3))
@@ -668,7 +781,7 @@ class IfunctionsNoM:
         
         
         nu = 1.
-        mu = 1.e-23 
+        mu = 4.1796514508e-23 #fix this 
         lam = 1.
         GC = 1.
         c = 1.
@@ -709,7 +822,7 @@ class IfunctionsNoM:
         else:
             uptrue_Xgamma = True 
             
-        
+        """
         #might pass this in instead. will ask 
         try0 = ElectronWaveFunction(nu, h, k, mu, M, lam, GC, c, tol)
         r_points,F_points_xkh, G_points_xkh = try0.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue)
@@ -723,7 +836,49 @@ class IfunctionsNoM:
         
         print(r_points[0],r_points_prime[0],r_points_gamma[0])
         
+        """
         
+        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        
+        hdu = fits.open(direcPhoton+str(l)+'ExtendedOmega.fits')
+        
+        r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
+        if uptrue_Xgamma == True: 
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_up')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
+        else: 
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('G_points_in')
+            
+        direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
+        if k>0:
+            hdu = fits.open(direcElectron+str(k)+'ExtendedOmega.fits')
+        else:
+            hdu = fits.open(direcElectron+'min'+str(k)+'ExtendedOmega.fits')
+        
+        r_points = hdu[self.h_index].data.field('rpoints_up')
+        if uptrue == True: 
+            F_points_xkh = hdu[self.h_index].data.field('F_points_up')
+            G_points_xkh = hdu[self.h_index].data.field('G_points_up')
+        else: 
+            F_points_xkh = hdu[self.h_index].data.field('F_points_in')
+            G_points_xkh = hdu[self.h_index].data.field('G_points_in')
+            
+        if k_prime>0:
+            hdu = fits.open(direcElectron+str(k_prime)+'ExtendedOmega.fits')
+        else:
+            hdu = fits.open(direcElectron+'min'+str(k_prime)+'ExtendedOmega.fits')
+        
+        #r_points = hdu[self.h_index+1]['rpoints_up']
+        if uptrue_Xprime == True: 
+            F_points_xkh_prime = hdu[self.h_prime_index].data.field('F_points_up')
+            G_points_xkh_prime = hdu[self.h_prime_index].data.field('G_points_up')
+        else: 
+            F_points_xkh_prime = hdu[self.h_prime_index].data.field('F_points_in')
+            G_points_xkh_prime = hdu[self.h_prime_index].data.field('G_points_in')
+        
+        
+
         
         
         gstar_xkh = np.conjugate(np.array(G_points_xkh))
@@ -732,10 +887,10 @@ class IfunctionsNoM:
         fstar_xkh = np.conjugate(np.array(F_points_xkh))
         f_xprime_kprime_hprime = np.array(F_points_xkh_prime)
             
-        psi_gammalomega = np.array(f_points_gammalomega)
-        psi_gammalomega_prime = np.array(z_points_gammalomega)
+        #psi_gammalomega = np.array(f_points_gammalomega)
+        #psi_gammalomega_prime = np.array(z_points_gammalomega)
         
-        r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
+        r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points]) #should be same for all I integrals (per M) so can pass to the functions 
         rdependentpart_top = (1-2*M/r)/(r**2*np.sqrt(2*omega**3))
         rdependentpart_bottom = np.sqrt(1-2*M/r)/(r*np.sqrt(2*omega))
         
@@ -747,7 +902,7 @@ class IfunctionsNoM:
         
         topline = (fstar_xkh*g_xprime_kprime_hprime - gstar_xkh*f_xprime_kprime_hprime)*np.sqrt(l*(l+1))*psi_gammalomega*rdependentpart_top
            
-        botline = (fstar_xkh*g_xprime_kprime_hprime + gstar_xkh*f_xprime_kprime_hprime)*((k-k_prime)/(omega*np.sqrt(l*(l+1))))*psi_gammalomega_prime*rdependentpart_top
+        botline = (fstar_xkh*g_xprime_kprime_hprime + gstar_xkh*f_xprime_kprime_hprime)*((k-k_prime)/(omega*np.sqrt(l*(l+1))))*psi_gammalomega_prime*rdependentpart_bottom
         
         
         #print(topline, botline)
@@ -757,7 +912,7 @@ class IfunctionsNoM:
         inte = 0.
         rstar_step = r_points[0]-r_points[1]   #switched order to get positive steps in
         
-        for index in range(len(topline)-1):
+        for index in range(len(topline)-1):  #rewrite as np.sum
             inte += .5*(topline[index]+topline[index+1] + botline[index]+botline[index+1])*rstar_step
         return inte*self.coeff_no_m_even #*self.coeff_m 
     
@@ -770,7 +925,7 @@ class IfunctionsNoM:
         
         
         nu = 1.
-        mu = 1.e-23 
+        mu = 4.1796514508e-23
         lam = 1.
         GC = 1.
         c = 1.
@@ -811,7 +966,7 @@ class IfunctionsNoM:
         else:
             uptrue_Xgamma = True 
             
-        
+        """
         #might pass this in instead. will ask 
         try0 = ElectronWaveFunction(nu, h, -k, mu, M, lam, GC, c, tol)
         r_points,F_points_xminkh, G_points_xminkh = try0.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue)
@@ -825,6 +980,47 @@ class IfunctionsNoM:
         
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
+        """
+        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        
+        hdu = fits.open(direcPhoton+str(l)+'.fits')
+        
+        r_points_gamma = hdu[self.omega_index]['rpoints_up']
+        if uptrue_Xgamma == True: 
+            psi_gammalomega = hdu[self.omega_index]['F_points_up']
+            psi_gammalomega_prime = hdu[self.omega_index]['z_points_up']
+        else: 
+            psi_gammalomega = hdu[self.omega_index]['F_points_in']
+            psi_gammalomega_prime = hdu[self.omega_index]['z_points_in']
+            
+        direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
+        if k<0:
+            hdu = fits.open(direcElectron+str(k)+'.fits')
+        else:
+            hdu = fits.open(direcElectron+'min'+str(k)+'.fits')
+        
+        r_points = hdu[self.h_index]['rpoints_up']
+        if uptrue == True: 
+            F_points_xminkh = hdu[self.h_index]['F_points_up']
+            G_points_xminkh = hdu[self.h_index]['G_points_up']
+        else: 
+            F_points_xminkh = hdu[self.h_index]['F_points_in']
+            G_points_xminkh = hdu[self.h_index]['G_points_in']
+            
+        if k_prime<0:
+            hdu = fits.open(direc+str(k_prime)+'.fits')
+        else:
+            hdu = fits.open(direc+'min'+str(k_prime)+'.fits')
+        
+        #r_points = hdu[self.h_index+1]['rpoints_up']
+        if uptrue_Xprime == True: 
+            F_points_xminkh_prime = hdu[self.h_index]['F_points_up']
+            G_points_xminkh_prime = hdu[self.h_index]['G_points_up']
+        else: 
+            F_points_xminkh_prime = hdu[self.h_index]['F_points_in']
+            G_points_xminkh_prime = hdu[self.h_index]['G_points_in']
+        
+   
         
         g_xminkh = np.array(G_points_xminkh)
         gstar_xprime_minkprime_hprime = np.conjugate(np.array(G_points_xminkh_prime))
@@ -832,8 +1028,8 @@ class IfunctionsNoM:
         f_xminkh = np.array(F_points_xminkh)
         fstar_xprime_minkprime_hprime = np.conjugate(np.array(F_points_xminkh_prime))
             
-        psi_gammalomega = np.array(f_points_gammalomega)
-        psi_gammalomega_prime = np.array(z_points_gammalomega)
+        #psi_gammalomega = np.array(f_points_gammalomega)
+        #psi_gammalomega_prime = np.array(z_points_gammalomega)
         
         r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart_top = (1-2*M/r)/(r**2*np.sqrt(2*omega**3))
@@ -867,7 +1063,7 @@ class IfunctionsNoM:
         
         
         nu = 1.
-        mu = 1.e-23 
+        mu = 4.1796514508e-23
         lam = 1.
         GC = 1.
         c = 1.
@@ -907,7 +1103,7 @@ class IfunctionsNoM:
         else:
             uptrue_Xgamma = True 
             
-        
+        """
         #might pass this in instead. will ask 
         try0 = ElectronWaveFunction(nu, h, k, mu, M, lam, GC, c, tol)
         r_points,F_points_xkh, G_points_xkh = try0.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue)
@@ -921,6 +1117,47 @@ class IfunctionsNoM:
         
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
+        """
+        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        
+        hdu = fits.open(direcPhoton+str(l)+'.fits')
+        
+        r_points_gamma = hdu[self.omega_index]['rpoints_up']
+        if uptrue_Xgamma == True: 
+            psi_gammalomega = hdu[self.omega_index]['F_points_up']
+            psi_gammalomega_prime = hdu[self.omega_index]['z_points_up']
+        else: 
+            psi_gammalomega = hdu[self.omega_index]['F_points_in']
+            psi_gammalomega_prime = hdu[self.omega_index]['z_points_in']
+            
+        direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
+        if k>0:
+            hdu = fits.open(direcElectron+str(k)+'.fits')
+        else:
+            hdu = fits.open(direcElectron+'min'+str(k)+'.fits')
+        
+        r_points = hdu[self.h_index]['rpoints_up']
+        if uptrue == True: 
+            F_points_xkh = hdu[self.h_index]['F_points_up']
+            G_points_xkh = hdu[self.h_index]['G_points_up']
+        else: 
+            F_points_xkh = hdu[self.h_index]['F_points_in']
+            G_points_xkh = hdu[self.h_index]['G_points_in']
+            
+        if k_prime<0:
+            hdu = fits.open(direc+str(k_prime)+'.fits')
+        else:
+            hdu = fits.open(direc+'min'+str(k_prime)+'.fits')
+        
+        #r_points = hdu[self.h_index+1]['rpoints_up']
+        if uptrue_Xprime == True: 
+            F_points_xminkh_prime = hdu[self.h_index]['F_points_up']
+            G_points_xminkh_prime = hdu[self.h_index]['G_points_up']
+        else: 
+            F_points_xminkh_prime = hdu[self.h_index]['F_points_in']
+            G_points_xminkh_prime = hdu[self.h_index]['G_points_in']
+        
+   
         
         gstar_xkh = np.conjugate(np.array(G_points_xkh))
         gstar_xprime_minkprime_hprime = np.conjugate(np.array(G_points_xminkh_prime))
@@ -928,7 +1165,7 @@ class IfunctionsNoM:
         fstar_xkh = np.conjugate(np.array(F_points_xkh))
         fstar_xprime_minkprime_hprime = np.conjugate(np.array(F_points_xminkh_prime))
             
-        psi_gammalomega = np.array(f_points_gammalomega)
+        #psi_gammalomega = np.array(f_points_gammalomega)
         
         r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
@@ -954,7 +1191,7 @@ class IfunctionsNoM:
         
         
         nu = 1.
-        mu = 1.e-23 
+        mu = 4.1796514508e-23
         lam = 1.
         GC = 1.
         c = 1.
@@ -994,7 +1231,7 @@ class IfunctionsNoM:
         else:
             uptrue_Xgamma = True 
             
-        
+        """
         #might pass this in instead. will ask 
         try0 = ElectronWaveFunction(nu, h,-k, mu, M, lam, GC, c, tol)
         r_points,F_points_xminkh, G_points_xminkh = try0.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue)
@@ -1008,6 +1245,46 @@ class IfunctionsNoM:
         
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
+        """
+        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        
+        hdu = fits.open(direcPhoton+str(l)+'.fits')
+        
+        r_points_gamma = hdu[self.omega_index]['rpoints_up']
+        if uptrue_Xgamma == True: 
+            psi_gammalomega = hdu[self.omega_index]['F_points_up']
+            psi_gammalomega_prime = hdu[self.omega_index]['z_points_up']
+        else: 
+            psi_gammalomega = hdu[self.omega_index]['F_points_in']
+            psi_gammalomega_prime = hdu[self.omega_index]['z_points_in']
+            
+        direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
+        if k<0:
+            hdu = fits.open(direcElectron+str(k)+'.fits')
+        else:
+            hdu = fits.open(direcElectron+'min'+str(k)+'.fits')
+        
+        r_points = hdu[self.h_index]['rpoints_up']
+        if uptrue == True: 
+            F_points_xminkh = hdu[self.h_index]['F_points_up']
+            G_points_xminkh = hdu[self.h_index]['G_points_up']
+        else: 
+            F_points_xminkh = hdu[self.h_index]['F_points_in']
+            G_points_xminkh = hdu[self.h_index]['G_points_in']
+            
+        if k_prime>0:
+            hdu = fits.open(direc+str(k_prime)+'.fits')
+        else:
+            hdu = fits.open(direc+'min'+str(k_prime)+'.fits')
+        
+        #r_points = hdu[self.h_index+1]['rpoints_up']
+        if uptrue_Xprime == True: 
+            F_points_xkh_prime = hdu[self.h_index]['F_points_up']
+            G_points_xkh_prime = hdu[self.h_index]['G_points_up']
+        else: 
+            F_points_xkh_prime = hdu[self.h_index]['F_points_in']
+            G_points_xkh_prime = hdu[self.h_index]['G_points_in']
+        
         
         g_xminkh = np.array(G_points_xminkh)
         g_xprime_kprime_hprime = np.array(G_points_xkh_prime)
@@ -1015,7 +1292,7 @@ class IfunctionsNoM:
         f_xminkh = np.array(F_points_xminkh)
         f_xprime_kprime_hprime = np.array(F_points_xkh_prime)
             
-        psi_gammalomega = np.array(f_points_gammalomega)
+       # psi_gammalomega = np.array(f_points_gammalomega)
         
         r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
@@ -1042,7 +1319,7 @@ class IfunctionsNoM:
         
         
         nu = 1.
-        mu = 1.e-23 
+        mu = 4.1796514508e-23
         lam = 1.
         GC = 1.
         c = 1.
@@ -1083,7 +1360,7 @@ class IfunctionsNoM:
         else:
             uptrue_Xgamma = True 
             
-        
+        """
         #might pass this in instead. will ask 
         try0 = ElectronWaveFunction(nu, h,k, mu, M, lam, GC, c, tol)
         r_points,F_points_xkh, G_points_xkh = try0.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue)
@@ -1097,6 +1374,47 @@ class IfunctionsNoM:
         
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
+        """
+        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        
+        hdu = fits.open(direcPhoton+str(l)+'.fits')
+        
+        r_points_gamma = hdu[self.omega_index]['rpoints_up']
+        if uptrue_Xgamma == True: 
+            psi_gammalomega = hdu[self.omega_index]['F_points_up']
+            psi_gammalomega_prime = hdu[self.omega_index]['z_points_up']
+        else: 
+            psi_gammalomega = hdu[self.omega_index]['F_points_in']
+            psi_gammalomega_prime = hdu[self.omega_index]['z_points_in']
+            
+        direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
+        if k>0:
+            hdu = fits.open(direcElectron+str(k)+'.fits')
+        else:
+            hdu = fits.open(direcElectron+'min'+str(k)+'.fits')
+        
+        r_points = hdu[self.h_index]['rpoints_up']
+        if uptrue == True: 
+            F_points_xkh = hdu[self.h_index]['F_points_up']
+            G_points_xkh = hdu[self.h_index]['G_points_up']
+        else: 
+            F_points_xkh = hdu[self.h_index]['F_points_in']
+            G_points_xkh = hdu[self.h_index]['G_points_in']
+            
+        if k_prime>0:
+            hdu = fits.open(direc+str(k_prime)+'.fits')
+        else:
+            hdu = fits.open(direc+'min'+str(k_prime)+'.fits')
+        
+        #r_points = hdu[self.h_index+1]['rpoints_up']
+        if uptrue_Xprime == True: 
+            F_points_xkh_prime = hdu[self.h_index]['F_points_up']
+            G_points_xkh_prime = hdu[self.h_index]['G_points_up']
+        else: 
+            F_points_xkh_prime = hdu[self.h_index]['F_points_in']
+            G_points_xkh_prime = hdu[self.h_index]['G_points_in']
+        
+   
         
         gstar_xkh = np.conjugate(np.array(G_points_xkh))
         g_xprime_kprime_hprime = np.array(G_points_xkh_prime)
@@ -1104,7 +1422,7 @@ class IfunctionsNoM:
         fstar_xkh = np.conjugate(np.array(F_points_xkh))
         f_xprime_kprime_hprime = np.array(F_points_xkh_prime)
             
-        psi_gammalomega = np.array(f_points_gammalomega)
+        #psi_gammalomega = np.array(f_points_gammalomega)
         
         r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
@@ -1129,7 +1447,7 @@ class IfunctionsNoM:
         
         
         nu = 1.
-        mu = 1.e-23 
+        mu = 4.1796514508e-23
         lam = 1.
         GC = 1.
         c = 1.
@@ -1169,7 +1487,7 @@ class IfunctionsNoM:
         else:
             uptrue_Xgamma = True 
             
-        
+        """
         #might pass this in instead. will ask 
         try0 = ElectronWaveFunction(nu, h,-k, mu, M, lam, GC, c, tol)
         r_points,F_points_xminkh, G_points_xminkh = try0.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue)
@@ -1183,14 +1501,54 @@ class IfunctionsNoM:
         
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
+        """
+        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
         
+        hdu = fits.open(direcPhoton+str(l)+'.fits')
+        
+        r_points_gamma = hdu[self.omega_index]['rpoints_up']
+        if uptrue_Xgamma == True: 
+            psi_gammalomega = hdu[self.omega_index]['F_points_up']
+            psi_gammalomega_prime = hdu[self.omega_index+1]['z_points_up']
+        else: 
+            psi_gammalomega = hdu[self.omega_index]['F_points_in']
+            psi_gammalomega_prime = hdu[self.omega_index]['z_points_in']
+            
+        direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
+        if k<0:
+            hdu = fits.open(direcElectron+str(k)+'.fits')
+        else:
+            hdu = fits.open(direcElectron+'min'+str(k)+'.fits')
+        
+        r_points = hdu[self.h_index]['rpoints_up']
+        if uptrue == True: 
+            F_points_xminkh = hdu[self.h_index]['F_points_up']
+            G_points_xminkh = hdu[self.h_index]['G_points_up']
+        else: 
+            F_points_xminkh = hdu[self.h_index]['F_points_in']
+            G_points_xminkh = hdu[self.h_index]['G_points_in']
+            
+        if k_prime<0:
+            hdu = fits.open(direc+str(k_prime)+'.fits')
+        else:
+            hdu = fits.open(direc+'min'+str(k_prime)+'.fits')
+        
+        #r_points = hdu[self.h_index+1]['rpoints_up']
+        if uptrue_Xprime == True: 
+            F_points_xminkh_prime = hdu[self.h_index]['F_points_up']
+            G_points_xminkh_prime = hdu[self.h_index]['G_points_up']
+        else: 
+            F_points_xminkh_prime = hdu[self.h_index]['F_points_in']
+            G_points_xminkh_prime = hdu[self.h_index]['G_points_in']
+        
+   
         g_xminkh = np.array(G_points_xminkh)
         gstar_xprime_minkprime_hprime = np.conjugate(np.array(G_points_xminkh_prime))
         
         f_xminkh = np.array(F_points_xminkh)
         fstar_xprime_minkprime_hprime = np.conjugate(np.array(F_points_xminkh_prime))
             
-        psi_gammalomega = np.array(f_points_gammalomega)
+        #psi_gammalomega = np.array(f_points_gammalomega)
         
         r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
