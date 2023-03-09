@@ -408,13 +408,10 @@ class IfunctionsNoM:
     def __init__(self,X,k,X_prime,k_prime,X_gamma,l,parity,h,h_prime,omega,M,n):
         self.X=X
         self.k=k
-        #self.m=m
         self.X_prime=X_prime
         self.k_prime=k_prime
-        #self.m_prime=m_prime
         self.X_gamma=X_gamma
         self.l=l
-        #self.m_gamma= m_gamma 
         self.h=h
         self.h_prime=h_prime
         self.omega=omega
@@ -431,9 +428,9 @@ class IfunctionsNoM:
         #self.step_size_for_inte = int(n*240000)
         
         
-        self.omega_index = round(self.omega*100/(8*np.pi*self.M) -1)
-        self.h_index = round(self.h*100/(8*np.pi*self.M) -1)
-        self.h_prime_index = round(self.h_prime*100/(8*np.pi*self.M) -1)
+        self.omega_index = round(self.omega*100*(8*np.pi*self.M) -1)
+        self.h_index = round(self.h*100*(8*np.pi*self.M) -1)
+        self.h_prime_index = round(self.h_prime*100*(8*np.pi*self.M) -1)
     
         #print(self.coeff_no_m_odd)
    
@@ -477,7 +474,7 @@ class IfunctionsNoM:
         #print(s,s_prime,j,j_prime)
         #print(np.sqrt((2*j+1)*(2*j_prime+1)*(2*l+1)/(4*np.pi)))
         #print((1-s*s_prime*(-1)**(j-j_prime+l))) #gives 0
-        x = s*np.sqrt((2*j+1)*(2*j_prime+1)*(2*l+1)/(4*np.pi))*w*   (1-s*s_prime*(-1)**(j-j_prime+l))
+        x = s*np.sqrt((2*j+1)*(2*j_prime+1)*(2*l+1)/(4*np.pi))*w*(1-s*s_prime*(-1)**(j-j_prime+l))
         
         return x
     
@@ -495,7 +492,7 @@ class IfunctionsNoM:
         GC = 1.
         c = 1.
         tol = 1.e-12
-        
+        """
         #far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
         #r_final = -70.*M  #in rstar 
@@ -518,7 +515,7 @@ class IfunctionsNoM:
         
         #r_initial_gamma = 5000.*M
         #r_final_gamma = 1000.*M
-        
+     """   
         
         if X==0:
             uptrue = False
@@ -566,9 +563,9 @@ class IfunctionsNoM:
          
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k>0:
-            hdu = fits.open(direcElectron+str(k)+'ExtendedOmega.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(k)+'ExtendedOmega.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
         r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
@@ -578,9 +575,9 @@ class IfunctionsNoM:
             F_points_xkh = hdu[self.h_index].data.field('F_points_in')
             G_points_xkh = hdu[self.h_index].data.field('G_points_in')
         if k_prime<0:
-            hdu = fits.open(direcElectron+str(k_prime)+'ExtendedOmega.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k_prime))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(k_prime)+'ExtendedOmega.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k_prime))+'ExtendedOmega.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
@@ -613,9 +610,9 @@ class IfunctionsNoM:
         #print(np.dot(gstar_xkh[0],gstar_xprime_minkprime_hprime[0]))
         #print(fstar_xkh*fstar_xprime_minkprime_hprime)
         
-        topline = (gstar_xkh*gstar_xprime_minkprime_hprime - fstar_xkh*fstar_xprime_minkprime_hprime)*np.sqrt(l*(l+1))*psi_gammalomega*rdependentpart_top
+        topline = (-1*gstar_xkh*gstar_xprime_minkprime_hprime + fstar_xkh*fstar_xprime_minkprime_hprime)*np.sqrt(l*(l+1))*psi_gammalomega*rdependentpart_top
            
-        botline = (fstar_xkh*fstar_xprime_minkprime_hprime + gstar_xkh*gstar_xprime_minkprime_hprime)*((k-k_prime)/(omega*np.sqrt(l*(l+1))))*psi_gammalomega_prime*rdependentpart_top
+        botline = (fstar_xkh*fstar_xprime_minkprime_hprime + gstar_xkh*gstar_xprime_minkprime_hprime)*((k-k_prime)/(omega*np.sqrt(l*(l+1))))*psi_gammalomega_prime*rdependentpart_bottom
         
         
         #print(topline, botline)
@@ -627,9 +624,11 @@ class IfunctionsNoM:
         
         #should we look at F and G for mixed up and in cases 
         
-        for index in range(len(topline)-1):
-            inte += .5*(topline[index]+topline[index+1] + botline[index]+botline[index+1])*rstar_step
-        return inte*self.coeff_no_m_even#*self.coeff_m 
+        #for index in range(len(topline)-1):
+        #    inte += .5*(topline[index]+topline[index+1] + botline[index]+botline[index+1])*rstar_step
+            
+        inte = (np.sum(topline[1:-1]+botline[1:-1])+.5*(topline[0]+topline[-1]+botline[0]+botline[-1]))*rstar_step
+        return inte*self.coeff_no_m_even   #*self.coeff_m 
     
     
     
@@ -645,7 +644,7 @@ class IfunctionsNoM:
         c = 1.
         tol = 1.e-10
         
-        #far from BH and then work towards that (up)
+        """#far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
         #r_final = -70.*M  #in rstar 
         #check
@@ -663,7 +662,7 @@ class IfunctionsNoM:
         
         #check 
         r_initial_gamma = lim1*M
-        r_final_gamma = lim2*M
+        r_final_gamma = lim2*M"""
         
         if X==0:
             uptrue = False
@@ -710,9 +709,9 @@ class IfunctionsNoM:
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k<0:
-            hdu = fits.open(direcElectron+str(k)+'ExtendedOmega.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(k)+'ExtendedOmega.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
         r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
@@ -723,9 +722,9 @@ class IfunctionsNoM:
             G_points_xminkh = hdu[self.h_index].data.field('G_points_in')
             
         if k_prime>0:
-            hdu = fits.open(direcElectron+str(k_prime)+'ExtendedOmega.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k_prime))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(k_prime)+'ExtendedOmega.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k_prime))+'ExtendedOmega.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
@@ -758,7 +757,7 @@ class IfunctionsNoM:
         
         topline = (g_xminkh*g_xprime_kprime_hprime - f_xminkh*f_xprime_kprime_hprime)*np.sqrt(l*(l+1))*psi_gammalomega*rdependentpart_top
            
-        botline = (g_xminkh*g_xprime_kprime_hprime + f_xminkh*f_xprime_kprime_hprime)*((k-k_prime)/(omega*np.sqrt(l*(l+1))))*psi_gammalomega_prime*rdependentpart_top
+        botline = (g_xminkh*g_xprime_kprime_hprime + f_xminkh*f_xprime_kprime_hprime)*((k-k_prime)/(omega*np.sqrt(l*(l+1))))*psi_gammalomega_prime*rdependentpart_bottom
         
         
         #print(topline, botline)
@@ -768,8 +767,7 @@ class IfunctionsNoM:
         inte = 0.
         rstar_step = r_points[0]-r_points[1]   #switched order to get positive steps in
         
-        for index in range(len(topline)-1):
-            inte += .5*(topline[index]+topline[index+1] + botline[index]+botline[index+1])*rstar_step
+        inte = (np.sum(topline[1:-1]+botline[1:-1])+.5*(topline[0]+topline[-1]+botline[0]+botline[-1]))*rstar_step
         return inte*self.coeff_no_m_even #*self.coeff_m 
     
     
@@ -781,12 +779,12 @@ class IfunctionsNoM:
         
         
         nu = 1.
-        mu = 4.1796514508e-23 #fix this 
+        mu = 4.1796514508e-23 
         lam = 1.
         GC = 1.
         c = 1.
         tol = 1.e-10
-        
+        """
         #far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
         #r_final = -70.*M  #in rstar 
@@ -806,7 +804,7 @@ class IfunctionsNoM:
         
         #check 
         r_initial_gamma = lim1*M
-        r_final_gamma = lim2*M
+        r_final_gamma = lim2*M"""
         
         if X==0:
             uptrue = False
@@ -852,9 +850,9 @@ class IfunctionsNoM:
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k>0:
-            hdu = fits.open(direcElectron+str(k)+'ExtendedOmega.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(k)+'ExtendedOmega.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
         r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
@@ -865,9 +863,9 @@ class IfunctionsNoM:
             G_points_xkh = hdu[self.h_index].data.field('G_points_in')
             
         if k_prime>0:
-            hdu = fits.open(direcElectron+str(k_prime)+'ExtendedOmega.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k_prime))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(k_prime)+'ExtendedOmega.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k_prime))+'ExtendedOmega.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
@@ -912,8 +910,7 @@ class IfunctionsNoM:
         inte = 0.
         rstar_step = r_points[0]-r_points[1]   #switched order to get positive steps in
         
-        for index in range(len(topline)-1):  #rewrite as np.sum
-            inte += .5*(topline[index]+topline[index+1] + botline[index]+botline[index+1])*rstar_step
+        inte = (np.sum(topline[1:-1]+botline[1:-1])+.5*(topline[0]+topline[-1]+botline[0]+botline[-1]))*rstar_step
         return inte*self.coeff_no_m_even #*self.coeff_m 
     
     
@@ -930,7 +927,7 @@ class IfunctionsNoM:
         GC = 1.
         c = 1.
         tol = 1.e-10
-        
+        """
        #far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
         #r_final = -70.*M  #in rstar 
@@ -950,7 +947,7 @@ class IfunctionsNoM:
         
         #check 
         r_initial_gamma = lim1*M
-        r_final_gamma = lim2*M
+        r_final_gamma = lim2*M"""
         
         if X==0:
             uptrue = False
@@ -985,40 +982,40 @@ class IfunctionsNoM:
         
         hdu = fits.open(direcPhoton+str(l)+'.fits')
         
-        r_points_gamma = hdu[self.omega_index]['rpoints_up']
+        r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
         if uptrue_Xgamma == True: 
-            psi_gammalomega = hdu[self.omega_index]['F_points_up']
-            psi_gammalomega_prime = hdu[self.omega_index]['z_points_up']
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_up')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
         else: 
-            psi_gammalomega = hdu[self.omega_index]['F_points_in']
-            psi_gammalomega_prime = hdu[self.omega_index]['z_points_in']
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k<0:
-            hdu = fits.open(direcElectron+str(k)+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(k)+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'.fits')
         
-        r_points = hdu[self.h_index]['rpoints_up']
+        r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
-            F_points_xminkh = hdu[self.h_index]['F_points_up']
-            G_points_xminkh = hdu[self.h_index]['G_points_up']
+            F_points_xminkh = hdu[self.h_index].data.field('F_points_up')
+            G_points_xminkh = hdu[self.h_index].data.field('G_points_up')
         else: 
-            F_points_xminkh = hdu[self.h_index]['F_points_in']
-            G_points_xminkh = hdu[self.h_index]['G_points_in']
+            F_points_xminkh = hdu[self.h_index].data.field('F_points_in')
+            G_points_xminkh = hdu[self.h_index].data.field('G_points_in')
             
         if k_prime<0:
-            hdu = fits.open(direc+str(k_prime)+'.fits')
+            hdu = fits.open(direc+str(np.abs(k_prime))+'.fits')
         else:
-            hdu = fits.open(direc+'min'+str(k_prime)+'.fits')
+            hdu = fits.open(direc+'min'+str(np.abs(k_prime))+'.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
-            F_points_xminkh_prime = hdu[self.h_index]['F_points_up']
-            G_points_xminkh_prime = hdu[self.h_index]['G_points_up']
+            F_points_xminkh_prime = hdu[self.h_index].data.field('F_points_up')
+            G_points_xminkh_prime = hdu[self.h_index].data.field('G_points_up')
         else: 
-            F_points_xminkh_prime = hdu[self.h_index]['F_points_in']
-            G_points_xminkh_prime = hdu[self.h_index]['G_points_in']
+            F_points_xminkh_prime = hdu[self.h_index].data.field('F_points_in')
+            G_points_xminkh_prime = hdu[self.h_index].data.field('G_points_in')
         
    
         
@@ -1041,7 +1038,7 @@ class IfunctionsNoM:
 
         topline = (g_xminkh*fstar_xprime_minkprime_hprime - f_xminkh*gstar_xprime_minkprime_hprime)*np.sqrt(l*(l+1))*psi_gammalomega*rdependentpart_top
            
-        botline = (g_xminkh*fstar_xprime_minkprime_hprime + f_xminkh*gstar_xprime_minkprime_hprime)*((k-k_prime)/(omega*np.sqrt(l*(l+1))))*psi_gammalomega_prime*rdependentpart_top
+        botline = (g_xminkh*fstar_xprime_minkprime_hprime + f_xminkh*gstar_xprime_minkprime_hprime)*((k-k_prime)/(omega*np.sqrt(l*(l+1))))*psi_gammalomega_prime*rdependentpart_bottom
         
         
         #print(topline, botline)
@@ -1051,8 +1048,7 @@ class IfunctionsNoM:
         inte = 0.
         rstar_step = r_points[0]-r_points[1]   #switched order to get positive steps in
         
-        for index in range(len(topline)-1):
-            inte += .5*(topline[index]+topline[index+1] + botline[index]+botline[index+1])*rstar_step
+        inte = (np.sum(topline[1:-1]+botline[1:-1])+.5*(topline[0]+topline[-1]+botline[0]+botline[-1]))*rstar_step
         return inte*self.coeff_no_m_even #*self.coeff_m 
     
     
@@ -1069,7 +1065,7 @@ class IfunctionsNoM:
         c = 1.
         tol = 1.e-10
         
-        #far from BH and then work towards that (up)
+        """#far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
         #r_final = -70.*M  #in rstar 
         
@@ -1083,7 +1079,7 @@ class IfunctionsNoM:
         
          #up for photon 
         #r_initial_gamma = 5000.*M
-        #r_final_gamma = -70.*M
+        #r_final_gamma = -70.*M"""
         
         
         #check 
@@ -1122,40 +1118,40 @@ class IfunctionsNoM:
         
         hdu = fits.open(direcPhoton+str(l)+'.fits')
         
-        r_points_gamma = hdu[self.omega_index]['rpoints_up']
+        r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
         if uptrue_Xgamma == True: 
-            psi_gammalomega = hdu[self.omega_index]['F_points_up']
-            psi_gammalomega_prime = hdu[self.omega_index]['z_points_up']
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_up')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
         else: 
-            psi_gammalomega = hdu[self.omega_index]['F_points_in']
-            psi_gammalomega_prime = hdu[self.omega_index]['z_points_in']
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k>0:
-            hdu = fits.open(direcElectron+str(k)+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(k)+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'.fits')
         
-        r_points = hdu[self.h_index]['rpoints_up']
+        r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
-            F_points_xkh = hdu[self.h_index]['F_points_up']
-            G_points_xkh = hdu[self.h_index]['G_points_up']
+            F_points_xkh = hdu[self.h_index].data.field('F_points_up')
+            G_points_xkh = hdu[self.h_index].data.field('G_points_up')
         else: 
-            F_points_xkh = hdu[self.h_index]['F_points_in']
-            G_points_xkh = hdu[self.h_index]['G_points_in']
+            F_points_xkh = hdu[self.h_index].data.field('F_points_in')
+            G_points_xkh = hdu[self.h_index].data.field('G_points_in')
             
         if k_prime<0:
-            hdu = fits.open(direc+str(k_prime)+'.fits')
+            hdu = fits.open(direc+str(np.abs(k_prime))+'.fits')
         else:
-            hdu = fits.open(direc+'min'+str(k_prime)+'.fits')
+            hdu = fits.open(direc+'min'+str(np.abs(k_prime))+'.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
-            F_points_xminkh_prime = hdu[self.h_index]['F_points_up']
-            G_points_xminkh_prime = hdu[self.h_index]['G_points_up']
+            F_points_xminkh_prime = hdu[self.h_index].data.field('F_points_up')
+            G_points_xminkh_prime = hdu[self.h_index].data.field('G_points_up')
         else: 
-            F_points_xminkh_prime = hdu[self.h_index]['F_points_in']
-            G_points_xminkh_prime = hdu[self.h_index]['G_points_in']
+            F_points_xminkh_prime = hdu[self.h_index].data.field('F_points_in')
+            G_points_xminkh_prime = hdu[self.h_index].data.field('G_points_in')
         
    
         
@@ -1179,8 +1175,7 @@ class IfunctionsNoM:
         inte = 0.
         rstar_step = r_points[0]-r_points[1] #switched order to get positive steps in
         
-        for index in range(len(line)-1):
-            inte += .5*(line[index]+line[index+1])*rstar_step
+        inte = (np.sum(line[1:-1])+.5*(line[0]+line[-1]))*rstar_step
         return inte*self.coeff_no_m_odd#*self.coeff_m 
     
     
@@ -1197,7 +1192,7 @@ class IfunctionsNoM:
         c = 1.
         tol = 1.e-10
         
-        #far from BH and then work towards that (up)
+        """#far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
         #r_final = -70.*M  #in rstar 
         
@@ -1212,7 +1207,7 @@ class IfunctionsNoM:
          #up for photon 
         #r_initial_gamma = 5000.*M
         #r_final_gamma = -70.*M
-        
+        """
         
         #check 
         r_initial_gamma = lim1*M
@@ -1250,40 +1245,40 @@ class IfunctionsNoM:
         
         hdu = fits.open(direcPhoton+str(l)+'.fits')
         
-        r_points_gamma = hdu[self.omega_index]['rpoints_up']
+        r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
         if uptrue_Xgamma == True: 
-            psi_gammalomega = hdu[self.omega_index]['F_points_up']
-            psi_gammalomega_prime = hdu[self.omega_index]['z_points_up']
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_up')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
         else: 
-            psi_gammalomega = hdu[self.omega_index]['F_points_in']
-            psi_gammalomega_prime = hdu[self.omega_index]['z_points_in']
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k<0:
-            hdu = fits.open(direcElectron+str(k)+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(k)+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'.fits')
         
-        r_points = hdu[self.h_index]['rpoints_up']
+        r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
-            F_points_xminkh = hdu[self.h_index]['F_points_up']
-            G_points_xminkh = hdu[self.h_index]['G_points_up']
+            F_points_xminkh = hdu[self.h_index].data.field('F_points_up')
+            G_points_xminkh = hdu[self.h_index].data.field('G_points_up')
         else: 
-            F_points_xminkh = hdu[self.h_index]['F_points_in']
-            G_points_xminkh = hdu[self.h_index]['G_points_in']
+            F_points_xminkh = hdu[self.h_index].data.field('F_points_in')
+            G_points_xminkh = hdu[self.h_index].data.field('G_points_in')
             
         if k_prime>0:
-            hdu = fits.open(direc+str(k_prime)+'.fits')
+            hdu = fits.open(direc+str(np.abs(k_prime))+'.fits')
         else:
-            hdu = fits.open(direc+'min'+str(k_prime)+'.fits')
+            hdu = fits.open(direc+'min'+str(np.abs(k_prime))+'.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
-            F_points_xkh_prime = hdu[self.h_index]['F_points_up']
-            G_points_xkh_prime = hdu[self.h_index]['G_points_up']
+            F_points_xkh_prime = hdu[self.h_index].data.field('F_points_up')
+            G_points_xkh_prime = hdu[self.h_index].data.field('G_points_up')
         else: 
-            F_points_xkh_prime = hdu[self.h_index]['F_points_in']
-            G_points_xkh_prime = hdu[self.h_index]['G_points_in']
+            F_points_xkh_prime = hdu[self.h_index].data.field('F_points_in')
+            G_points_xkh_prime = hdu[self.h_index].data.field('G_points_in')
         
         
         g_xminkh = np.array(G_points_xminkh)
@@ -1306,8 +1301,7 @@ class IfunctionsNoM:
         inte = 0.
         rstar_step = r_points[0]-r_points[1] #switched order to get positive steps in
         
-        for index in range(len(line)-1):
-            inte += .5*(line[index]+line[index+1])*rstar_step
+        inte = (np.sum(line[1:-1])+.5*(line[0]+line[-1]))*rstar_step
         return inte*self.coeff_no_m_odd#*self.coeff_m 
     
     
@@ -1325,7 +1319,7 @@ class IfunctionsNoM:
         c = 1.
         tol = 1.e-10
         
-        #far from BH and then work towards that (up)
+        """#far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
        # r_final = -70.*M  #in rstar 
         
@@ -1344,7 +1338,7 @@ class IfunctionsNoM:
         
         #check 
         r_initial_gamma = lim1*M
-        r_final_gamma = lim2*M
+        r_final_gamma = lim2*M"""
         
         if X==0:
             uptrue = False
@@ -1379,40 +1373,40 @@ class IfunctionsNoM:
         
         hdu = fits.open(direcPhoton+str(l)+'.fits')
         
-        r_points_gamma = hdu[self.omega_index]['rpoints_up']
+        r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
         if uptrue_Xgamma == True: 
-            psi_gammalomega = hdu[self.omega_index]['F_points_up']
-            psi_gammalomega_prime = hdu[self.omega_index]['z_points_up']
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_up')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
         else: 
-            psi_gammalomega = hdu[self.omega_index]['F_points_in']
-            psi_gammalomega_prime = hdu[self.omega_index]['z_points_in']
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k>0:
-            hdu = fits.open(direcElectron+str(k)+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(k)+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'.fits')
         
-        r_points = hdu[self.h_index]['rpoints_up']
+        r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
-            F_points_xkh = hdu[self.h_index]['F_points_up']
-            G_points_xkh = hdu[self.h_index]['G_points_up']
+            F_points_xkh = hdu[self.h_index].data.field('F_points_up')
+            G_points_xkh = hdu[self.h_index].data.field('G_points_up')
         else: 
-            F_points_xkh = hdu[self.h_index]['F_points_in']
-            G_points_xkh = hdu[self.h_index]['G_points_in']
+            F_points_xkh = hdu[self.h_index].data.field('F_points_in')
+            G_points_xkh = hdu[self.h_index].data.field('G_points_in')
             
         if k_prime>0:
-            hdu = fits.open(direc+str(k_prime)+'.fits')
+            hdu = fits.open(direc+str(np.abs(k_prime))+'.fits')
         else:
-            hdu = fits.open(direc+'min'+str(k_prime)+'.fits')
+            hdu = fits.open(direc+'min'+str(np.abs(k_prime))+'.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
-            F_points_xkh_prime = hdu[self.h_index]['F_points_up']
-            G_points_xkh_prime = hdu[self.h_index]['G_points_up']
+            F_points_xkh_prime = hdu[self.h_index].data.field('F_points_up')
+            G_points_xkh_prime = hdu[self.h_index].data.field('G_points_up')
         else: 
-            F_points_xkh_prime = hdu[self.h_index]['F_points_in']
-            G_points_xkh_prime = hdu[self.h_index]['G_points_in']
+            F_points_xkh_prime = hdu[self.h_index].data.field('F_points_in')
+            G_points_xkh_prime = hdu[self.h_index].data.field('G_points_in')
         
    
         
@@ -1436,8 +1430,7 @@ class IfunctionsNoM:
         inte = 0.
         rstar_step = r_points[0]-r_points[1] #switched order to get positive steps in
         
-        for index in range(len(line)-1):
-            inte += .5*(line[index]+line[index+1])*rstar_step
+        inte = (np.sum(line[1:-1])+.5*(line[0]+line[-1]))*rstar_step
         return inte*self.coeff_no_m_odd#*self.coeff_m 
     
     
@@ -1453,7 +1446,7 @@ class IfunctionsNoM:
         c = 1.
         tol = 1.e-10
         
-        #far from BH and then work towards that (up)
+        """#far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
         #r_final = -70.*M  #in rstar 
         
@@ -1472,7 +1465,8 @@ class IfunctionsNoM:
         
         #check 
         r_initial_gamma = lim1*M
-        r_final_gamma = lim2*M
+        r_final_gamma = lim2*M"""
+        
         if X==0:
             uptrue = False
         else:
@@ -1506,40 +1500,40 @@ class IfunctionsNoM:
         
         hdu = fits.open(direcPhoton+str(l)+'.fits')
         
-        r_points_gamma = hdu[self.omega_index]['rpoints_up']
+        r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
         if uptrue_Xgamma == True: 
-            psi_gammalomega = hdu[self.omega_index]['F_points_up']
-            psi_gammalomega_prime = hdu[self.omega_index+1]['z_points_up']
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_up')
+            psi_gammalomega_prime = hdu[self.omega_index+1].data.field('z_points_up')
         else: 
-            psi_gammalomega = hdu[self.omega_index]['F_points_in']
-            psi_gammalomega_prime = hdu[self.omega_index]['z_points_in']
+            psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k<0:
-            hdu = fits.open(direcElectron+str(k)+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(k)+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'.fits')
         
-        r_points = hdu[self.h_index]['rpoints_up']
+        r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
-            F_points_xminkh = hdu[self.h_index]['F_points_up']
-            G_points_xminkh = hdu[self.h_index]['G_points_up']
+            F_points_xminkh = hdu[self.h_index].data.field('F_points_up')
+            G_points_xminkh = hdu[self.h_index].data.field('G_points_up')
         else: 
-            F_points_xminkh = hdu[self.h_index]['F_points_in']
-            G_points_xminkh = hdu[self.h_index]['G_points_in']
+            F_points_xminkh = hdu[self.h_index].data.field('F_points_in')
+            G_points_xminkh = hdu[self.h_index].data.field('G_points_in')
             
         if k_prime<0:
-            hdu = fits.open(direc+str(k_prime)+'.fits')
+            hdu = fits.open(direc+str(np.abs(k_prime))+'.fits')
         else:
-            hdu = fits.open(direc+'min'+str(k_prime)+'.fits')
+            hdu = fits.open(direc+'min'+str(np.abs(k_prime))+'.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
-            F_points_xminkh_prime = hdu[self.h_index]['F_points_up']
-            G_points_xminkh_prime = hdu[self.h_index]['G_points_up']
+            F_points_xminkh_prime = hdu[self.h_index].data.field('F_points_up')
+            G_points_xminkh_prime = hdu[self.h_index].data.field('G_points_up')
         else: 
-            F_points_xminkh_prime = hdu[self.h_index]['F_points_in']
-            G_points_xminkh_prime = hdu[self.h_index]['G_points_in']
+            F_points_xminkh_prime = hdu[self.h_index].data.field('F_points_in')
+            G_points_xminkh_prime = hdu[self.h_index].data.field('G_points_in')
         
    
         g_xminkh = np.array(G_points_xminkh)
@@ -1562,8 +1556,7 @@ class IfunctionsNoM:
         inte = 0.
         rstar_step = r_points[0]-r_points[1] #switched order to get positive steps in
         
-        for index in range(len(line)-1):
-            inte += .5*(line[index]+line[index+1])*rstar_step
+        inte = (np.sum(line[1:-1])+.5*(line[0]+line[-1]))*rstar_step
         return inte*self.coeff_no_m_odd#*self.coeff_m 
     
 
