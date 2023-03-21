@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[3]:
-
 
 import numpy as np 
 import math
@@ -481,7 +476,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarplusplusevenfunc(self,X,k,X_prime,k_prime,X_gamma,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarplusplusevenfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
         
         #x=0 in, x=1 up
         
@@ -526,11 +521,6 @@ class IfunctionsNoM:
         else:
             uptrue_Xprime = True
             
-        if X_gamma==0:
-            uptrue_Xgamma = False
-        else:
-            uptrue_Xgamma = True 
-            
         
         #might pass this in instead. will ask 
         #try0 = ElectronWaveFunction(nu, h, k, mu, M, lam, GC, c, tol)
@@ -549,7 +539,7 @@ class IfunctionsNoM:
         #want to write a script that shows intermediate results, can put in plots about transmission coefficients 
         
         
-        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        """direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
         
         hdu = fits.open(direcPhoton+str(l)+'.fits')
         
@@ -559,7 +549,7 @@ class IfunctionsNoM:
             psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
         else: 
             psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
-            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')"""
          
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k>0:
@@ -605,7 +595,7 @@ class IfunctionsNoM:
         
         
         #print(gstar_xkh,fstar_xkh,psi_gammalomega,rdependentpart_top,rdependentpart_bottom)
-        print(r_points[0],r_points_gamma[0])
+        #print(r_points[0],r_points_gamma[0])
         
         #print(np.dot(gstar_xkh[0],gstar_xprime_minkprime_hprime[0]))
         #print(fstar_xkh*fstar_xprime_minkprime_hprime)
@@ -632,7 +622,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarminusminusevenfunc(self,X,k,X_prime,k_prime,X_gamma,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarminusminusevenfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
         
         #x=0 in, x=1 up
         
@@ -673,13 +663,7 @@ class IfunctionsNoM:
         else:
             uptrue_Xprime = True
             
-        if X_gamma==0:
-            uptrue_Xgamma = False
-        else:
-            uptrue_Xgamma = True 
-            
-        
-        #might pass this in instead. will ask 
+       
         
         """
         try0 = ElectronWaveFunction(nu, h, -k, mu, M, lam, GC, c, tol)
@@ -695,7 +679,7 @@ class IfunctionsNoM:
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
         """
-        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        """direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
         
         hdu = fits.open(direcPhoton+str(l)+'ExtendedOmega.fits')
         
@@ -705,7 +689,7 @@ class IfunctionsNoM:
             psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
         else: 
             psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
-            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')"""
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k<0:
@@ -773,7 +757,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarplusminusevenfunc(self,X,k,X_prime,k_prime,X_gamma,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarplusminusevenfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
         
         #x=0 in, x=1 up
         
@@ -814,11 +798,7 @@ class IfunctionsNoM:
             uptrue_Xprime = False
         else:
             uptrue_Xprime = True
-            
-        if X_gamma==0:
-            uptrue_Xgamma = False
-        else:
-            uptrue_Xgamma = True 
+        
             
         """
         #might pass this in instead. will ask 
@@ -836,7 +816,7 @@ class IfunctionsNoM:
         
         """
         
-        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        """direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
         
         hdu = fits.open(direcPhoton+str(l)+'ExtendedOmega.fits')
         
@@ -846,7 +826,7 @@ class IfunctionsNoM:
             psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
         else: 
             psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
-            psi_gammalomega_prime = hdu[self.omega_index].data.field('G_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('G_points_in')"""
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k>0:
@@ -916,7 +896,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarminusplusevenfunc(self,X,k,X_prime,k_prime,X_gamma,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarminusplusevenfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
         
         #x=0 in, x=1 up
         
@@ -958,11 +938,6 @@ class IfunctionsNoM:
         else:
             uptrue_Xprime = True
             
-        if X_gamma==0:
-            uptrue_Xgamma = False
-        else:
-            uptrue_Xgamma = True 
-            
         """
         #might pass this in instead. will ask 
         try0 = ElectronWaveFunction(nu, h, -k, mu, M, lam, GC, c, tol)
@@ -978,9 +953,9 @@ class IfunctionsNoM:
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
         """
-        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        """direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
         
-        hdu = fits.open(direcPhoton+str(l)+'.fits')
+        hdu = fits.open(direcPhoton+str(l)+'ExtendedOmega.fits')
         
         r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
         if uptrue_Xgamma == True: 
@@ -988,14 +963,14 @@ class IfunctionsNoM:
             psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
         else: 
             psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
-            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')"""
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k<0:
-            hdu = fits.open(direcElectron+str(np.abs(k))+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'.fits')
-        
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
+        #print(self.h_index)
         r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
             F_points_xminkh = hdu[self.h_index].data.field('F_points_up')
@@ -1005,9 +980,9 @@ class IfunctionsNoM:
             G_points_xminkh = hdu[self.h_index].data.field('G_points_in')
             
         if k_prime<0:
-            hdu = fits.open(direc+str(np.abs(k_prime))+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k_prime))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direc+'min'+str(np.abs(k_prime))+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k_prime))+'ExtendedOmega.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
@@ -1034,7 +1009,7 @@ class IfunctionsNoM:
         
         
         #print(gstar_xkh,fstar_xkh,psi_gammalomega,rdependentpart_top,rdependentpart_bottom)
-        print(r_points[0],r_points_gamma[0])
+        #print(r_points[0],r_points_gamma[0])
 
         topline = (g_xminkh*fstar_xprime_minkprime_hprime - f_xminkh*gstar_xprime_minkprime_hprime)*np.sqrt(l*(l+1))*psi_gammalomega*rdependentpart_top
            
@@ -1053,7 +1028,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarplusplusoddfunc(self,X,k,X_prime,k_prime,X_gamma,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarplusplusoddfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
         
         #x=0 in, x=1 up
         
@@ -1094,10 +1069,6 @@ class IfunctionsNoM:
         else:
             uptrue_Xprime = True
             
-        if X_gamma==0:
-            uptrue_Xgamma = False
-        else:
-            uptrue_Xgamma = True 
             
         """
         #might pass this in instead. will ask 
@@ -1114,9 +1085,9 @@ class IfunctionsNoM:
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
         """
-        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        """direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
         
-        hdu = fits.open(direcPhoton+str(l)+'.fits')
+        hdu = fits.open(direcPhoton+str(l)+'ExtendedOmega.fits')
         
         r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
         if uptrue_Xgamma == True: 
@@ -1124,13 +1095,13 @@ class IfunctionsNoM:
             psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
         else: 
             psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
-            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')"""
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k>0:
-            hdu = fits.open(direcElectron+str(np.abs(k))+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
         r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
@@ -1141,9 +1112,9 @@ class IfunctionsNoM:
             G_points_xkh = hdu[self.h_index].data.field('G_points_in')
             
         if k_prime<0:
-            hdu = fits.open(direc+str(np.abs(k_prime))+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k_prime))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direc+'min'+str(np.abs(k_prime))+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k_prime))+'ExtendedOmega.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
@@ -1166,7 +1137,7 @@ class IfunctionsNoM:
         r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
         
-        print(r_points[0],r_points_gamma[0])
+        #print(r_points[0],r_points_gamma[0])
 
         
         line = (fstar_xkh * fstar_xprime_minkprime_hprime + gstar_xkh*gstar_xprime_minkprime_hprime)*psi_gammalomega*rdependentpart
@@ -1180,7 +1151,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarminusminusoddfunc(self,X,k,X_prime,k_prime,X_gamma,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarminusminusoddfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
         
         #x=0 in, x=1 up
         
@@ -1221,10 +1192,6 @@ class IfunctionsNoM:
         else:
             uptrue_Xprime = True
             
-        if X_gamma==0:
-            uptrue_Xgamma = False
-        else:
-            uptrue_Xgamma = True 
             
         """
         #might pass this in instead. will ask 
@@ -1241,9 +1208,9 @@ class IfunctionsNoM:
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
         """
-        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        """direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
         
-        hdu = fits.open(direcPhoton+str(l)+'.fits')
+        hdu = fits.open(direcPhoton+str(l)+'ExtendedOmega.fits')
         
         r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
         if uptrue_Xgamma == True: 
@@ -1252,12 +1219,12 @@ class IfunctionsNoM:
         else: 
             psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
             psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')
-            
+            """
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k<0:
-            hdu = fits.open(direcElectron+str(np.abs(k))+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
         r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
@@ -1268,9 +1235,9 @@ class IfunctionsNoM:
             G_points_xminkh = hdu[self.h_index].data.field('G_points_in')
             
         if k_prime>0:
-            hdu = fits.open(direc+str(np.abs(k_prime))+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k_prime))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direc+'min'+str(np.abs(k_prime))+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k_prime))+'ExtendedOmega.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
@@ -1292,7 +1259,7 @@ class IfunctionsNoM:
         r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
         
-        print(r_points[0],r_points_gamma[0])
+        #print(r_points[0],r_points_gamma[0])
 
         
         line = (g_xminkh * g_xprime_kprime_hprime + f_xminkh*f_xprime_kprime_hprime)*psi_gammalomega*rdependentpart
@@ -1307,7 +1274,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarplusminusoddfunc(self,X,k,X_prime,k_prime,X_gamma,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarplusminusoddfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
         
         #x=0 in, x=1 up
         
@@ -1349,10 +1316,6 @@ class IfunctionsNoM:
         else:
             uptrue_Xprime = True
             
-        if X_gamma==0:
-            uptrue_Xgamma = False
-        else:
-            uptrue_Xgamma = True 
             
         """
         #might pass this in instead. will ask 
@@ -1369,9 +1332,11 @@ class IfunctionsNoM:
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
         """
-        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
         
-        hdu = fits.open(direcPhoton+str(l)+'.fits')
+        
+        """direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        
+        hdu = fits.open(direcPhoton+str(l)+'ExtendedOmega.fits')
         
         r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
         if uptrue_Xgamma == True: 
@@ -1379,13 +1344,13 @@ class IfunctionsNoM:
             psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
         else: 
             psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
-            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')"""
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k>0:
-            hdu = fits.open(direcElectron+str(np.abs(k))+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
         r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
@@ -1396,9 +1361,9 @@ class IfunctionsNoM:
             G_points_xkh = hdu[self.h_index].data.field('G_points_in')
             
         if k_prime>0:
-            hdu = fits.open(direc+str(np.abs(k_prime))+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k_prime))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direc+'min'+str(np.abs(k_prime))+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k_prime))+'ExtendedOmega.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
@@ -1421,7 +1386,7 @@ class IfunctionsNoM:
         r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
         
-        print(r_points[0],r_points_gamma[0])
+        #print(r_points[0],r_points_gamma[0])
 
         
         line = (fstar_xkh * g_xprime_kprime_hprime + gstar_xkh*f_xprime_kprime_hprime)*psi_gammalomega*rdependentpart
@@ -1434,7 +1399,7 @@ class IfunctionsNoM:
         return inte*self.coeff_no_m_odd#*self.coeff_m 
     
     
-    def IBarminusplusoddfunc(self,X,k,X_prime,k_prime,X_gamma,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarminusplusoddfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
         
         #x=0 in, x=1 up
         
@@ -1476,10 +1441,7 @@ class IfunctionsNoM:
         else:
             uptrue_Xprime = True
             
-        if X_gamma==0:
-            uptrue_Xgamma = False
-        else:
-            uptrue_Xgamma = True 
+        
             
         """
         #might pass this in instead. will ask 
@@ -1496,9 +1458,12 @@ class IfunctionsNoM:
         #phot_try1= PhotonWaveFunction(M,omega,l,tol)
         #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
         """
-        direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
         
-        hdu = fits.open(direcPhoton+str(l)+'.fits')
+        
+        
+        """direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        
+        hdu = fits.open(direcPhoton+str(l)+'ExtendedOmega.fits')
         
         r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
         if uptrue_Xgamma == True: 
@@ -1506,13 +1471,13 @@ class IfunctionsNoM:
             psi_gammalomega_prime = hdu[self.omega_index+1].data.field('z_points_up')
         else: 
             psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
-            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')
+            psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')"""
             
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         if k<0:
-            hdu = fits.open(direcElectron+str(np.abs(k))+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
         r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
@@ -1523,9 +1488,9 @@ class IfunctionsNoM:
             G_points_xminkh = hdu[self.h_index].data.field('G_points_in')
             
         if k_prime<0:
-            hdu = fits.open(direc+str(np.abs(k_prime))+'.fits')
+            hdu = fits.open(direcElectron+str(np.abs(k_prime))+'ExtendedOmega.fits')
         else:
-            hdu = fits.open(direc+'min'+str(np.abs(k_prime))+'.fits')
+            hdu = fits.open(direcElectron+'min'+str(np.abs(k_prime))+'ExtendedOmega.fits')
         
         #r_points = hdu[self.h_index+1]['rpoints_up']
         if uptrue_Xprime == True: 
@@ -1547,7 +1512,7 @@ class IfunctionsNoM:
         r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
         
-        print(r_points[0],r_points_gamma[0])
+        #print(r_points[0],r_points_gamma[0])
 
         
         line = (g_xminkh * fstar_xprime_minkprime_hprime + f_xminkh*gstar_xprime_minkprime_hprime)*psi_gammalomega*rdependentpart
@@ -1559,4 +1524,3 @@ class IfunctionsNoM:
         inte = (np.sum(line[1:-1])+.5*(line[0]+line[-1]))*rstar_step
         return inte*self.coeff_no_m_odd#*self.coeff_m 
     
-
