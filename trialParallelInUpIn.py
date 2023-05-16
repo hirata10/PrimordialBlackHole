@@ -68,10 +68,10 @@ hdulXo = fits.HDUList([empty_primaryo])
 #only 5 l, so can be diff file for each l
 #so each table is an h, and the column is k and row is k' 
 
-h_s = np.linspace(.01*T,20*T,2000)
+#h_s = np.linspace(.01*T,20*T,2000)
 
-h_prime_allowed = h_s[omega_index+2:]
-h = np.linspace(.02*T,20*T,1999)
+#h_prime_allowed = h_s[omega_index+2:]
+h = np.linspace(.01*T,20*T,2000)
 #print(h_prime_allowed[0]/T)
 vals_e = np.zeros((len(ks),len(k_primes)),dtype=complex)
 vals_o = np.zeros((len(ks),len(k_primes)),dtype=complex)
@@ -119,10 +119,11 @@ def prof_make_tables():
 
         for k_prime in range(len(k_primes)):
             j_prime = (np.abs(k_primes[k_prime]) - 1/2)
-            tryA2=Inp.IfunctionsNoM(X,ks[k],X_prime,k_primes[k_prime],X_gamma,l,parity,h[x],h_prime_allowed[x],omega,M,n)
+            tryA2=Inp.IfunctionsNoM(X,ks[k],X_prime,k_primes[k_prime],X_gamma,l,parity,h[x],h[x]+omega,omega,M,n)
 
-            if np.abs(tryA2.coeff_no_m_even)>1.e-10 or np.abs(tryA2.coeff_no_m_odd)>1.e-10:
-                vals_e[k][k_prime], vals_o[k][k_prime] = tryA2.IBarminusplusfunc(X,ks[k],X_prime,k_primes[k_prime],psi_gammalomega,psi_gammalomega_prime,h[x],l,h_prime_allowed[x],omega,M,rs,r_points_gamma,F_points_xminkh,G_points_xminkh)
+            #if np.abs(tryA2.coeff_no_m_even)>1.e-10 or np.abs(tryA2.coeff_no_m_odd)>1.e-10:
+            #if tryA2.coeff_no_m_even!=0 and tryA2.coeff_no_m_odd !=0:
+            vals_e[k][k_prime], vals_o[k][k_prime] = tryA2.IBarminusplusfunc(X,ks[k],X_prime,k_primes[k_prime],psi_gammalomega,psi_gammalomega_prime,l,h[x],h[x]+omega,omega,M,rs,r_points_gamma,F_points_xminkh,G_points_xminkh)
 
     col0 = fits.Column(name='k val',format='D',array=ks)
     col1 = fits.Column(name='k_prime -10',format='M',array=vals_e[:,0])
