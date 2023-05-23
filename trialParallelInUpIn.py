@@ -68,16 +68,16 @@ hdulXo = fits.HDUList([empty_primaryo])
 #only 5 l, so can be diff file for each l
 #so each table is an h, and the column is k and row is k' 
 
-#h_s = np.linspace(.01*T,20*T,2000)
+h_s = np.linspace(.01*T,20*T,2000)
 
 #h_prime_allowed = h_s[omega_index+2:]
-h = np.linspace(.01*T,20*T,2000)
+h = np.linspace(.01*T,20*T,1999)
 #print(h_prime_allowed[0]/T)
 vals_e = np.zeros((len(ks),len(k_primes)),dtype=complex)
 vals_o = np.zeros((len(ks),len(k_primes)),dtype=complex)
 
 
-h_in = round(h[0]*100*(8*np.pi*M) -1)
+#h_in = round(h[0]*100*(8*np.pi*M) -1)
 #print(h_in)
 
 direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
