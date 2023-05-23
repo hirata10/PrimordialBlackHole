@@ -1,4 +1,10 @@
 
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[3]:
+
+
 import numpy as np 
 import math
 import matplotlib.pyplot as plt 
@@ -11,8 +17,9 @@ from sympy.physics.wigner import wigner_3j
 import module1 as m1 # module1 contains the function to convert r_star to r\n",
 
 import cmath
-from astropy.io import fits
- 
+#from astropy.io import fits
+import fitsio
+import time 
 
 
 # In[4]:
@@ -476,7 +483,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarplusplusevenfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarplusplusevenfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points):
         
         #x=0 in, x=1 up
         
@@ -486,7 +493,7 @@ class IfunctionsNoM:
         lam = 1.
         GC = 1.
         c = 1.
-        tol = 1.e-12
+        #tol = 1.e-12
         """
         #far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
@@ -557,7 +564,7 @@ class IfunctionsNoM:
         else:
             hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
-        r_points = hdu[self.h_index].data.field('rpoints_up')
+        #r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
             F_points_xkh = hdu[self.h_index].data.field('F_points_up')
             G_points_xkh = hdu[self.h_index].data.field('G_points_up')
@@ -589,7 +596,7 @@ class IfunctionsNoM:
         #psi_gammalomega = np.array(f_points_gammalomega)
         #psi_gammalomega_prime = np.array(z_points_gammalomega)
         
-        r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
+        #r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart_top = (1-2*M/r)/(r**2*np.sqrt(2*omega**3))
         rdependentpart_bottom = np.sqrt(1-2*M/r)/(r*np.sqrt(2*omega))
         
@@ -622,7 +629,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarminusminusevenfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarminusminusevenfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points):
         
         #x=0 in, x=1 up
         
@@ -632,7 +639,7 @@ class IfunctionsNoM:
         lam = 1.
         GC = 1.
         c = 1.
-        tol = 1.e-10
+        #tol = 1.e-10
         
         """#far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
@@ -697,7 +704,7 @@ class IfunctionsNoM:
         else:
             hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
-        r_points = hdu[self.h_index].data.field('rpoints_up')
+        #r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
             F_points_xminkh = hdu[self.h_index].data.field('F_points_up')
             G_points_xminkh = hdu[self.h_index].data.field('G_points_up')
@@ -729,7 +736,7 @@ class IfunctionsNoM:
         #psi_gammalomega = np.array(f_points_gammalomega)
         #psi_gammalomega_prime = np.array(z_points_gammalomega_)
         
-        r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
+        #r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart_top = (1-2*M/r)/(r**2*np.sqrt(2*omega**3))
         rdependentpart_bottom = np.sqrt(1-2*M/r)/(r*np.sqrt(2*omega))
         
@@ -757,7 +764,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarplusminusevenfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarplusminusevenfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points):
         
         #x=0 in, x=1 up
         
@@ -767,7 +774,7 @@ class IfunctionsNoM:
         lam = 1.
         GC = 1.
         c = 1.
-        tol = 1.e-10
+        #tol = 1.e-10
         """
         #far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
@@ -834,7 +841,7 @@ class IfunctionsNoM:
         else:
             hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
-        r_points = hdu[self.h_index].data.field('rpoints_up')
+        #r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
             F_points_xkh = hdu[self.h_index].data.field('F_points_up')
             G_points_xkh = hdu[self.h_index].data.field('G_points_up')
@@ -868,7 +875,7 @@ class IfunctionsNoM:
         #psi_gammalomega = np.array(f_points_gammalomega)
         #psi_gammalomega_prime = np.array(z_points_gammalomega)
         
-        r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points]) #should be same for all I integrals (per M) so can pass to the functions 
+        #r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points]) #should be same for all I integrals (per M) so can pass to the functions 
         rdependentpart_top = (1-2*M/r)/(r**2*np.sqrt(2*omega**3))
         rdependentpart_bottom = np.sqrt(1-2*M/r)/(r*np.sqrt(2*omega))
         
@@ -896,7 +903,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarminusplusevenfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarminusplusevenfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points, F_points_xminkh, G_points_xminkh):
         
         #x=0 in, x=1 up
         
@@ -906,7 +913,7 @@ class IfunctionsNoM:
         lam = 1.
         GC = 1.
         c = 1.
-        tol = 1.e-10
+        #tol = 1.e-10
         """
        #far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
@@ -964,14 +971,16 @@ class IfunctionsNoM:
         else: 
             psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
             psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_in')"""
-            
+        
+        
+        
         direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
-        if k<0:
+        """if k<0:
             hdu = fits.open(direcElectron+str(np.abs(k))+'ExtendedOmega.fits')
         else:
             hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         #print(self.h_index)
-        r_points = hdu[self.h_index].data.field('rpoints_up')
+        #r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
             F_points_xminkh = hdu[self.h_index].data.field('F_points_up')
             G_points_xminkh = hdu[self.h_index].data.field('G_points_up')
@@ -979,19 +988,22 @@ class IfunctionsNoM:
             F_points_xminkh = hdu[self.h_index].data.field('F_points_in')
             G_points_xminkh = hdu[self.h_index].data.field('G_points_in')
             
+       """
         if k_prime<0:
             hdu = fits.open(direcElectron+str(np.abs(k_prime))+'ExtendedOmega.fits')
         else:
             hdu = fits.open(direcElectron+'min'+str(np.abs(k_prime))+'ExtendedOmega.fits')
         
-        #r_points = hdu[self.h_index+1]['rpoints_up']
+        time1= time.time()
         if uptrue_Xprime == True: 
             F_points_xminkh_prime = hdu[self.h_index].data.field('F_points_up')
             G_points_xminkh_prime = hdu[self.h_index].data.field('G_points_up')
         else: 
             F_points_xminkh_prime = hdu[self.h_index].data.field('F_points_in')
             G_points_xminkh_prime = hdu[self.h_index].data.field('G_points_in')
-        
+        time2 = time.time()
+        #hdu.close()
+        print('Time diff is ' + str(time2-time1))
    
         
         g_xminkh = np.array(G_points_xminkh)
@@ -1003,7 +1015,7 @@ class IfunctionsNoM:
         #psi_gammalomega = np.array(f_points_gammalomega)
         #psi_gammalomega_prime = np.array(z_points_gammalomega)
         
-        r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
+        #r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart_top = (1-2*M/r)/(r**2*np.sqrt(2*omega**3))
         rdependentpart_bottom = np.sqrt(1-2*M/r)/(r*np.sqrt(2*omega))
         
@@ -1028,7 +1040,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarplusplusoddfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarplusplusoddfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points):
         
         #x=0 in, x=1 up
         
@@ -1038,7 +1050,7 @@ class IfunctionsNoM:
         lam = 1.
         GC = 1.
         c = 1.
-        tol = 1.e-10
+        #tol = 1.e-10
         
         """#far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
@@ -1057,9 +1069,7 @@ class IfunctionsNoM:
         #r_final_gamma = -70.*M"""
         
         
-        #check 
-        r_initial_gamma = lim1*M
-        r_final_gamma = lim2*M
+        
         if X==0:
             uptrue = False
         else:
@@ -1103,7 +1113,7 @@ class IfunctionsNoM:
         else:
             hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
-        r_points = hdu[self.h_index].data.field('rpoints_up')
+        #r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
             F_points_xkh = hdu[self.h_index].data.field('F_points_up')
             G_points_xkh = hdu[self.h_index].data.field('G_points_up')
@@ -1134,7 +1144,7 @@ class IfunctionsNoM:
             
         #psi_gammalomega = np.array(f_points_gammalomega)
         
-        r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
+       # r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
         
         #print(r_points[0],r_points_gamma[0])
@@ -1151,7 +1161,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarminusminusoddfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarminusminusoddfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points):
         
         #x=0 in, x=1 up
         
@@ -1161,7 +1171,7 @@ class IfunctionsNoM:
         lam = 1.
         GC = 1.
         c = 1.
-        tol = 1.e-10
+        #tol = 1.e-10
         
         """#far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
@@ -1226,7 +1236,7 @@ class IfunctionsNoM:
         else:
             hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
-        r_points = hdu[self.h_index].data.field('rpoints_up')
+        #r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
             F_points_xminkh = hdu[self.h_index].data.field('F_points_up')
             G_points_xminkh = hdu[self.h_index].data.field('G_points_up')
@@ -1256,7 +1266,7 @@ class IfunctionsNoM:
             
        # psi_gammalomega = np.array(f_points_gammalomega)
         
-        r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
+        #r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
         
         #print(r_points[0],r_points_gamma[0])
@@ -1274,7 +1284,7 @@ class IfunctionsNoM:
     
     
     
-    def IBarplusminusoddfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarplusminusoddfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points):
         
         #x=0 in, x=1 up
         
@@ -1284,7 +1294,7 @@ class IfunctionsNoM:
         lam = 1.
         GC = 1.
         c = 1.
-        tol = 1.e-10
+        #tol = 1.e-10
         
         """#far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
@@ -1352,7 +1362,7 @@ class IfunctionsNoM:
         else:
             hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
-        r_points = hdu[self.h_index].data.field('rpoints_up')
+        #r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
             F_points_xkh = hdu[self.h_index].data.field('F_points_up')
             G_points_xkh = hdu[self.h_index].data.field('G_points_up')
@@ -1383,7 +1393,7 @@ class IfunctionsNoM:
             
         #psi_gammalomega = np.array(f_points_gammalomega)
         
-        r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
+        #r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
         
         #print(r_points[0],r_points_gamma[0])
@@ -1399,7 +1409,7 @@ class IfunctionsNoM:
         return inte*self.coeff_no_m_odd#*self.coeff_m 
     
     
-    def IBarminusplusoddfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,lim1,lim2):
+    def IBarminusplusoddfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points):
         
         #x=0 in, x=1 up
         
@@ -1409,7 +1419,7 @@ class IfunctionsNoM:
         lam = 1.
         GC = 1.
         c = 1.
-        tol = 1.e-10
+        #tol = 1.e-10
         
         """#far from BH and then work towards that (up)
         #r_initial = 5000.*M #in rstar
@@ -1479,7 +1489,7 @@ class IfunctionsNoM:
         else:
             hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
         
-        r_points = hdu[self.h_index].data.field('rpoints_up')
+        #r_points = hdu[self.h_index].data.field('rpoints_up')
         if uptrue == True: 
             F_points_xminkh = hdu[self.h_index].data.field('F_points_up')
             G_points_xminkh = hdu[self.h_index].data.field('G_points_up')
@@ -1509,7 +1519,7 @@ class IfunctionsNoM:
             
         #psi_gammalomega = np.array(f_points_gammalomega)
         
-        r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
+        #r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
         rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
         
         #print(r_points[0],r_points_gamma[0])
@@ -1524,3 +1534,234 @@ class IfunctionsNoM:
         inte = (np.sum(line[1:-1])+.5*(line[0]+line[-1]))*rstar_step
         return inte*self.coeff_no_m_odd#*self.coeff_m 
     
+    def IBarminusplusfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points, F_points_xminkh, G_points_xminkh):
+        
+        #x=0 in, x=1 up
+        
+        
+        nu = 1.
+        mu = 4.1796514508e-23
+        lam = 1.
+        GC = 1.
+        c = 1.
+        #tol = 1.e-10
+        
+        if X==0:
+            uptrue = False
+        else:
+            uptrue = True
+        if X_prime==0:
+            uptrue_Xprime = False
+        else:
+            uptrue_Xprime = True
+                    
+        
+        direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
+
+        if k_prime<0:
+            hdu = fitsio.FITS(direcElectron+str(np.abs(k_prime))+'ExtendedOmega.fits')
+        else:
+            hdu = fitsio.FITS(direcElectron+'min'+str(np.abs(k_prime))+'ExtendedOmega.fits')
+        
+        #time1= time.time()
+        if uptrue_Xprime == True: 
+            F_points_xminkh_prime = hdu[self.h_index]['F_points_up'][:]
+            G_points_xminkh_prime = hdu[self.h_index]['G_points_up'][:]
+        else: 
+            F_points_xminkh_prime = hdu[self.h_index]['F_points_in'][:]
+            G_points_xminkh_prime = hdu[self.h_index]['G_points_in'][:]
+        #time2 = time.time()
+        hdu.close()
+        #print('Time diff is ' + str(time2-time1))
+        #print(F_points_xminkh_prime)
+        #F_points_xminkh_prime = data[0]
+        #G_points_xminkh_prime = data[1]
+     
+        
+        g_xminkh = np.array(G_points_xminkh)
+        gstar_xprime_minkprime_hprime = np.conjugate(np.array(G_points_xminkh_prime))
+        
+        f_xminkh = np.array(F_points_xminkh)
+        fstar_xprime_minkprime_hprime = np.conjugate(np.array(F_points_xminkh_prime))
+            
+        rdependentpart_top = (1-2*M/r)/(r**2*np.sqrt(2*omega**3))
+        rdependentpart_bottom = np.sqrt(1-2*M/r)/(r*np.sqrt(2*omega))
+        
+        topline = (g_xminkh*fstar_xprime_minkprime_hprime - f_xminkh*gstar_xprime_minkprime_hprime)*np.sqrt(l*(l+1))*psi_gammalomega*rdependentpart_top
+           
+        botline = (g_xminkh*fstar_xprime_minkprime_hprime + f_xminkh*gstar_xprime_minkprime_hprime)*((k-k_prime)/(omega*np.sqrt(l*(l+1))))*psi_gammalomega_prime*rdependentpart_bottom
+        
+       
+        inte_e = 0.
+        rstar_step = r_points[0]-r_points[1]   #switched order to get positive steps in
+        inte_e = (np.sum(topline[1:-1]+botline[1:-1])+.5*(topline[0]+topline[-1]+botline[0]+botline[-1]))*rstar_step
+        
+        
+        rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
+        
+        line = (g_xminkh * fstar_xprime_minkprime_hprime + f_xminkh*gstar_xprime_minkprime_hprime)*psi_gammalomega*rdependentpart
+        
+        inte_o = 0.
+        inte_o = (np.sum(line[1:-1])+.5*(line[0]+line[-1]))*rstar_step
+        
+        return (inte_e*self.coeff_no_m_even,inte_o*self.coeff_no_m_odd)#
+        
+    def IBarplusplusfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points, F_points_xkh, G_points_xkh):
+        
+        #x=0 in, x=1 up
+        
+        
+        nu = 1.
+        mu = 4.1796514508e-23
+        lam = 1.
+        GC = 1.
+        c = 1.
+        #tol = 1.e-12
+        """
+        #far from BH and then work towards that (up)
+        #r_initial = 5000.*M #in rstar
+        #r_final = -70.*M  #in rstar 
+        
+        #check
+        r_initial = lim1*M #in rstar
+        r_final = lim2*M  #in rstar 
+        #
+        #r_final_gamma = 5000.*M
+        #r_initial_gamma = -70.*M
+        
+        
+         #up for photon 
+        r_initial_gamma = lim1*M
+        #r_final_gamma = -70.*M
+        
+        
+        #check 
+        r_final_gamma=lim2*M
+        
+        #r_initial_gamma = 5000.*M
+        #r_final_gamma = 1000.*M
+     """   
+        
+        if X==0:
+            uptrue = False
+        else:
+            uptrue = True
+        if X_prime==0:
+            uptrue_Xprime = False
+        else:
+            uptrue_Xprime = True
+            
+        
+        #might pass this in instead. will ask 
+        #try0 = ElectronWaveFunction(nu, h, k, mu, M, lam, GC, c, tol)
+        #r_points,F_points_xkh, G_points_xkh = try0.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue)
+        
+        #try1 = ElectronWaveFunction(nu, h_prime, -k_prime, mu, M, lam, GC, c, tol)
+       # r_points_prime,F_points_xminkh_prime, G_points_xminkh_prime = try1.RK_4(r_initial, r_final, self.step_size_for_inte, up = uptrue_Xprime)
+        
+        
+        #phot_try0= PhotonWaveFunction(M,omega,l,tol)
+        #r_points_gamma, f_points_gammalomega, z_points_gammalomega, f_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, self.step_size_for_inte, up = uptrue_Xgamma)
+        
+        #phot_try1= PhotonWaveFunction(M,omega,l,tol)
+        #r_points_gamma_prime, f_points_gammalomega_prime, z_points_gammalomega_prime = phot_try0.RK_4(r_initial_gamma, r_final_gamma, N, up = uptrue_Xgamma_prime)
+        
+        #want to write a script that shows intermediate results, can put in plots about transmission coefficients 
+        
+        
+        """direcPhoton = '/fs/scratch/PCON0003/emily/PhotonWaveFunctionFits/'
+        
+        #hdu = fits.open(direcPhoton+str(l)+'.fits')
+        
+        #r_points_gamma = hdu[self.omega_index].data.field('rpoints_up')
+        #if uptrue_Xgamma == True: 
+        #    psi_gammalomega = hdu[self.omega_index].data.field('F_points_up')
+        #    psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')
+        #else: 
+        #    psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
+        #    psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')"""
+         
+        direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
+        #if k>0:
+        #    hdu = fits.open(direcElectron+str(np.abs(k))+'ExtendedOmega.fits')
+        #else:
+        #    hdu = fits.open(direcElectron+'min'+str(np.abs(k))+'ExtendedOmega.fits')
+        
+        #r_points = hdu[self.h_index].data.field('rpoints_up')
+        #if uptrue == True: 
+        #    F_points_xkh = hdu[self.h_index].data.field('F_points_up')
+        #    G_points_xkh = hdu[self.h_index].data.field('G_points_up')
+        #else: 
+        #    F_points_xkh = hdu[self.h_index].data.field('F_points_in')
+        #    G_points_xkh = hdu[self.h_index].data.field('G_points_in')
+        if k_prime<0:
+            hdu = fitsio.FITS(direcElectron+str(np.abs(k_prime))+'ExtendedOmega.fits')
+        else:
+            hdu = fitsio.FITS(direcElectron+'min'+str(np.abs(k_prime))+'ExtendedOmega.fits')
+        
+        #r_points = hdu[self.h_index+1]['rpoints_up']
+        if uptrue_Xprime == True: 
+            F_points_xminkh_prime = hdu[self.h_prime_index]['F_points_up'][:]
+            G_points_xminkh_prime = hdu[self.h_prime_index]['G_points_up'][:]
+        else: 
+            F_points_xminkh_prime = hdu[self.h_prime_index]['F_points_in'][:]
+            G_points_xminkh_prime = hdu[self.h_prime_index]['G_points_in'][:]
+        
+        #need analytic continuation of wavefunctions! 
+        #can just add the analytic piece at the end! so need to do that also
+            
+        gstar_xkh = np.conjugate(np.array(G_points_xkh))
+        gstar_xprime_minkprime_hprime = np.conjugate(np.array(G_points_xminkh_prime))
+        
+        fstar_xkh = np.conjugate(np.array(F_points_xkh))
+        fstar_xprime_minkprime_hprime = np.conjugate(np.array(F_points_xminkh_prime))
+            
+        #psi_gammalomega = np.array(f_points_gammalomega)
+        #psi_gammalomega_prime = np.array(z_points_gammalomega)
+        
+        #r = np.array([m1.r_star_to_r(x,M,tol) for x in r_points])
+        rdependentpart_top = (1-2*M/r)/(r**2*np.sqrt(2*omega**3))
+        rdependentpart_bottom = np.sqrt(1-2*M/r)/(r*np.sqrt(2*omega))
+        
+        
+        #print(gstar_xkh,fstar_xkh,psi_gammalomega,rdependentpart_top,rdependentpart_bottom)
+        #print(r_points[0],r_points_gamma[0])
+        
+        #print(np.dot(gstar_xkh[0],gstar_xprime_minkprime_hprime[0]))
+        #print(fstar_xkh*fstar_xprime_minkprime_hprime)
+        
+        topline = (-1*gstar_xkh*gstar_xprime_minkprime_hprime + fstar_xkh*fstar_xprime_minkprime_hprime)*np.sqrt(l*(l+1))*psi_gammalomega*rdependentpart_top
+           
+        botline = (fstar_xkh*fstar_xprime_minkprime_hprime + gstar_xkh*gstar_xprime_minkprime_hprime)*((k-k_prime)/(omega*np.sqrt(l*(l+1))))*psi_gammalomega_prime*rdependentpart_bottom
+        
+        
+        #print(topline, botline)
+        #return topline+botline
+        
+        #midpoint method
+        intee = 0.
+        rstar_step = r_points[0]-r_points[1] #switched order to get positive steps in
+        
+        #should we look at F and G for mixed up and in cases 
+        
+        #for index in range(len(topline)-1):
+        #    intee += .5*(topline[index]+topline[index+1] + botline[index]+botline[index+1])*rstar_step
+            
+        intee = (np.sum(topline[1:-1]+botline[1:-1])+.5*(topline[0]+topline[-1]+botline[0]+botline[-1]))*rstar_step
+
+        rdependentpart = np.sqrt((1-2*M/r))/(2*r*np.sqrt(2*omega))
+        
+        #print(r_points[0],r_points_gamma[0])
+
+        
+        line = (fstar_xkh * fstar_xprime_minkprime_hprime + gstar_xkh*gstar_xprime_minkprime_hprime)*psi_gammalomega*rdependentpart
+        
+        #midpoint method
+        inteo = 0.
+        
+        inteo = (np.sum(line[1:-1])+.5*(line[0]+line[-1]))*rstar_step
+ 
+    
+        
+        return (intee*self.coeff_no_m_even,inteo*self.coeff_no_m_odd)  
+
