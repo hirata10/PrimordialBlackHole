@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -N EWFm1
+#PBS -A PCON0003
+#PBS -l walltime=48:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l mem=48gb
+
+#PBS -j oe
+cd $PBS_O_WORKDIR
+module load miniconda3
+source activate local1
+python GenerateElectronWavefunctionsmink.py 1
