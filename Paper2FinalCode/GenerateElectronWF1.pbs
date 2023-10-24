@@ -9,4 +9,4 @@
 cd $PBS_O_WORKDIR
 module load miniconda3
 source activate local1
-python GenerateElectronWavefunctions.py
+python GenerateElectronWavefunctionsk.py 1
