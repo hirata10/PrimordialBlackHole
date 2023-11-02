@@ -639,7 +639,7 @@ class IfunctionsNoM:
         #    psi_gammalomega = hdu[self.omega_index].data.field('F_points_in')
         #    psi_gammalomega_prime = hdu[self.omega_index].data.field('z_points_up')"""
          
-        z#direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
+        #direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
         #if k>0:
         #    hdu = fits.open(direcElectron+str(np.abs(k))+'ExtendedOmega.fits')
         #else:
