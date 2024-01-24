@@ -23,13 +23,15 @@ omega_scale = float(sys.argv[4])
 l= int(sys.argv[5])
 
 
-hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/Constants.fits')
+hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/ConstantsM2.fits')
 nu =  hdu_c[0].header['nu']
 mu = hdu_c[0].header['mu']
 lam = hdu_c[0].header['lam']
 GC = hdu_c[0].header['GC']
 c = hdu_c[0].header['c']
 tol = hdu_c[0].header['tol']
+direcPhoton = hdu_c[0].header['P_direc']
+direcElectron = hdu_c[0].header['E_direc']
 
 M = hdu_c[0].header['M']
 T = hdu_c[0].header['Temp']
@@ -97,7 +99,7 @@ def prof_make_tables():
     
         
        
-    h_index= round(h[x]*100*(8*np.pi*M) -1)
+    h_index= round(h[x]*100*(8*np.pi*M))
 
 
     for k in range(len(ks)):
@@ -118,7 +120,7 @@ def prof_make_tables():
         for k_prime in range(len(k_primes)):
             j_prime = (np.abs(k_primes[k_prime]) - 1/2)
             tryA2=Inp.IfunctionsNoM(X,ks[k],X_prime,k_primes[k_prime],X_gamma,l,parity,h[x],h[x]+omega,omega,M,n)
-vals_e[k][k_prime], vals_o[k][k_prime] = tryA2.IBarminusplusfunc(X,ks[k],X_prime,k_primes[k_prime],psi_gammalomega,psi_gammalomega_prime,l,h[x],h[x]+omega,omega,M,rs,r_points_gamma,F_points_xminkh,G_points_xminkh)
+            vals_e[k][k_prime], vals_o[k][k_prime] = tryA2.IBarminusplusfunc(X,ks[k],X_prime,k_primes[k_prime],psi_gammalomega,psi_gammalomega_prime,l,h[x],h[x]+omega,omega,M,rs,r_points_gamma,F_points_xminkh,G_points_xminkh,nu,mu,lam,GC,c,direcElectron)
 
     col0 = fits.Column(name='k val',format='D',array=ks)
     col1 = fits.Column(name='k_prime -10',format='M',array=vals_e[:,0])
@@ -194,4 +196,3 @@ hdulXo.writeto(patho,overwrite=True)
 
 hdulX.close()
 hdulXo.close()
-
