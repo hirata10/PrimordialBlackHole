@@ -22,13 +22,15 @@ patho = sys.argv[3]
 omega_scale = float(sys.argv[4])
 l= int(sys.argv[5])
 
-hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/Constants.fits')
+hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/ConstantsM2.fits')
 nu =  hdu_c[0].header['nu']
 mu = hdu_c[0].header['mu']
 lam = hdu_c[0].header['lam']
 GC = hdu_c[0].header['GC']
 c = hdu_c[0].header['c']
 tol = hdu_c[0].header['tol']
+direcPhoton = hdu_c[0].header['P_direc']
+direcElectron = hdu_c[0].header['E_direc']
 
 M = hdu_c[0].header['M']
 T = hdu_c[0].header['Temp']
@@ -87,14 +89,13 @@ def prof_make_tables():
     
         
        
-    h_index= round(h[x]*100*(8*np.pi*M) -1)
+    h_index= round(h[x]*100*(8*np.pi*M))
 
-    if (omega-h[x])>0.099*T:
+    if (omega-h[x])>0.0095*T:
         for k in range(len(ks)):
             
             j=(np.abs(ks[k]) - 1/2)
 
-            direcElectron = '/users/PCON0003/koivuemily/PrimordialBlackHole/ElectronWaveFunctionFits/'
             if ks[k]>0:
                 hdu = fits.open(direcElectron+str(np.abs(ks[k]))+'ExtendedOmega.fits')
             else:
@@ -109,7 +110,7 @@ def prof_make_tables():
                 tryA2=Inp.IfunctionsNoM(X,ks[k],X_prime,k_primes[k_prime],X_gamma,l,parity,h[x],omega-h[x],omega,M,n)
 
                 
-                vals_e[k][k_prime], vals_o[k][k_prime] = tryA2.IBarplusplusfunc(X,ks[k],X_prime,k_primes[k_prime],psi_gammalomega,psi_gammalomega_prime,l,h[x],omega-h[x],omega,M,rs,r_points_gamma,F_points_xkh,G_points_xkh)
+                vals_e[k][k_prime], vals_o[k][k_prime] = tryA2.IBarplusplusfunc(X,ks[k],X_prime,k_primes[k_prime],psi_gammalomega,psi_gammalomega_prime,l,h[x],omega-h[x],omega,M,rs,r_points_gamma,F_points_xkh,G_points_xkh,nu,mu,lam,GC,c,direcElectron)
 
     col0 = fits.Column(name='k val',format='D',array=ks)
     col1 = fits.Column(name='k_prime -10',format='M',array=vals_e[:,0])
@@ -185,4 +186,3 @@ hdulXo.writeto(patho,overwrite=True)
 
 hdulX.close()
 hdulXo.close()
-
