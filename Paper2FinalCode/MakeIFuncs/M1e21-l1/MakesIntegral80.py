@@ -12,7 +12,7 @@ omega_val = np.array(sys.argv[3:])
 omega_val = omega_val.astype(float)
 
 
-hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/ConstantsM.fits')
+hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/Constants.fits')
 
 M = hdu_c[0].header['M']
 Temp = hdu_c[0].header['Temp']
