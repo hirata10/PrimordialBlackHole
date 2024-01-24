@@ -4,16 +4,21 @@ import os
 import time
 import sys 
 
+
+
 output_path = str(sys.argv[1])
-omega_val = np.array(sys.argv[2:])
+l = int(sys.argv[2])
+omega_val = np.array(sys.argv[3:])
 omega_val = omega_val.astype(float)
 
 
-hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/Constants.fits')
+hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/ConstantsM.fits')
 
 M = hdu_c[0].header['M']
 Temp = hdu_c[0].header['Temp']
 alpha = hdu_c[0].header['alpha']
+mu = hdu_c[0].header['mu']
+
 
 direcElectron = hdu_c[0].header['E_direc']
 direcPhoton = hdu_c[0].header['P_direc']
@@ -22,7 +27,7 @@ direcPhoton = hdu_c[0].header['P_direc']
 
 def getRandT(l,omega):
     hduP = fits.open(direcPhoton+str(l)+'ExtendedOmega.fits')
-    omega_index = round(omega*100*(8*np.pi*M) )
+    omega_index = round(omega*100*(8*np.pi*M))
     
     R,T = hduP[omega_index].header['R'],hduP[omega_index].header['T']
     return R,T
@@ -37,7 +42,7 @@ ks=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7,8,9,10]
 k_primes=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7,8,9,10]
 
 def get_energy_index(en):
-    return round(en*100*(8*np.pi*M)-1)
+    return round(en*100*(8*np.pi*M))
 
 
 
@@ -404,7 +409,7 @@ def term9part(R,T,h,omega,h_index):
     coeff = 0. 
     if os.path.exists('Omega'+str(omega)+'T/PlusPlus/UpUpUp/trialParallelresulte'+str(h_index)+'.fits')==True:
         if os.path.exists('Omega'+str(omega)+'T/PlusPlus/UpUpIn/trialParallelresulte'+str(h_index)+'.fits')==True:
-            coeff = 1/((np.exp((h-omega))+1)*(np.exp(h)+1))
+            coeff = 1/((np.exp((omega-h))+1)*(np.exp(h)+1))
             I_hdu_e1 = fits.open('Omega'+str(omega)+'T/PlusPlus/UpUpUp/trialParallelresulte'+str(h_index)+'.fits')
             I_hdu_o1 = fits.open('Omega'+str(omega)+'T/PlusPlus/UpUpUp/trialParallelresulto'+str(h_index)+'.fits')
             I_hdu_e2 = fits.open('Omega'+str(omega)+'T/PlusPlus/UpUpIn/trialParallelresulte'+str(h_index)+'.fits')
@@ -468,7 +473,7 @@ def term12part(R,T,h,omega,h_index):
     if os.path.exists('Omega'+str(omega)+'T/PlusPlus/UpInUp/trialParallelresulte'+str(h_index)+'.fits')==True:
         if os.path.exists('Omega'+str(omega)+'T/PlusPlus/UpInIn/trialParallelresulte'+str(h_index)+'.fits')==True:
    
-            coeff = 2*np.exp(h)/((np.exp(h)+1))
+            coeff = -2*np.exp(h)/((np.exp(h)+1)*(np.exp(omega)-1))
             I_hdu_e1 = fits.open('Omega'+str(omega)+'T/PlusPlus/UpInUp/trialParallelresulte'+str(h_index)+'.fits')
             I_hdu_o1 = fits.open('Omega'+str(omega)+'T/PlusPlus/UpInUp/trialParallelresulto'+str(h_index)+'.fits')
             I_hdu_e2 = fits.open('Omega'+str(omega)+'T/PlusPlus/UpInIn/trialParallelresulte'+str(h_index)+'.fits')
@@ -491,7 +496,7 @@ def term13part(R,T,h,omega,h_index):
         if os.path.exists('Omega'+str(omega)+'T/MinusPlus/UpInIn/trialParallelresulte'+str(h_index)+'.fits')==True:
    
    
-            coeff = 2/((np.exp(h)+1))
+            coeff = -2/((np.exp(h)+1)*(np.exp(omega)-1))
             I_hdu_e1 = fits.open('Omega'+str(omega)+'T/MinusPlus/UpInUp/trialParallelresulte'+str(h_index)+'.fits')
             I_hdu_o1 = fits.open('Omega'+str(omega)+'T/MinusPlus/UpInUp/trialParallelresulto'+str(h_index)+'.fits')
             I_hdu_e2 = fits.open('Omega'+str(omega)+'T/MinusPlus/UpInIn/trialParallelresulte'+str(h_index)+'.fits')
@@ -598,9 +603,9 @@ def partinfoI(omega):
     #ITotAllHe = np.zeros((2000))
     #ITotAllHo = np.zeros((2000))
     print(ITotAllHe.shape)
-    R,T = getRandT(1,omega*Temp) 
+    R,T = getRandT(l,omega*Temp) 
     print(R)
-    hs = np.linspace(.02, 20, 2000)
+    hs = np.linspace(.01, 20, 2000)
     for h_place in range(2000):
         print(h_place)
         h_index = get_energy_index(hs[h_place]*Temp)
