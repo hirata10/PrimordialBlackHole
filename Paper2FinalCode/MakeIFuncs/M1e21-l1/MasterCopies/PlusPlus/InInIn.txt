@@ -1,0 +1,13 @@
+#!/bin/bash
+#SBATCH --job-name=InInIn
+#SBATCH --account=PCON0003
+#SBATCH --time=30:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=2
+#SBATCH --exclude=p0212,p0213,p0214,p0215
+#SBATCH --mem=20gb
+
+cd $PBS_O_WORKDIR
+module load miniconda3
+source activate local1
+perl GeneratorInInIn.pl > InInIn/info.txt
