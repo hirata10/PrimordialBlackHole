@@ -22,7 +22,7 @@ patho = sys.argv[3]
 omega_scale = float(sys.argv[4])
 l= int(sys.argv[5])
 
-hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/ConstantsM2.fits')
+hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/Constants.fits')
 nu =  hdu_c[0].header['nu']
 mu = hdu_c[0].header['mu']
 lam = hdu_c[0].header['lam']
