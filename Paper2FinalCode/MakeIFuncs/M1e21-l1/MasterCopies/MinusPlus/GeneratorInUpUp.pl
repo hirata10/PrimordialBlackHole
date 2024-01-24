@@ -2,13 +2,17 @@ $N = 100;
 $omega = 5;
 $total = 2000 - $omega*100;
 $j_max = $total/$N;
-$l=1;
-## i gives h indexing 
+$l = 1; 
 
+$i_biggest = $total -1;
 
-for $j (0..$j_max-1){
+for $j (0..$j_max){
     print "round $j/$j_max: "; system "date";
-    for $i ($j*$N..(($j+1)*$N)-1) {
+    $i_max = ($j+1)*$N -1; 
+    if ($i_max>$i_biggest){
+        $i_max = $i_biggest;
+    }
+    for $i ($j*$N..$i_max) {
             print "fork $i: "; system "date";
             my $pid = fork();
             if (not $pid) {
