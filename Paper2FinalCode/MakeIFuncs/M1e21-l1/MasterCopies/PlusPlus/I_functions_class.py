@@ -430,9 +430,9 @@ class IfunctionsNoM:
         #self.step_size_for_inte = int(n*240000)
         
         
-        self.omega_index = round(self.omega*100*(8*np.pi*self.M) -1)
-        self.h_index = round(self.h*100*(8*np.pi*self.M) -1)
-        self.h_prime_index = round(self.h_prime*100*(8*np.pi*self.M) -1)
+        self.omega_index = round(self.omega*100*(8*np.pi*self.M))
+        self.h_index = round(self.h*100*(8*np.pi*self.M))
+        self.h_prime_index = round(self.h_prime*100*(8*np.pi*self.M))
     
         #print(self.coeff_no_m_odd)
    
@@ -482,21 +482,21 @@ class IfunctionsNoM:
     
     
     
-    def IBarminusplusfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points, F_points_xminkh, G_points_xminkh):
+    def IBarminusplusfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points, F_points_xminkh, G_points_xminkh,nu,mu,lam,GC,c,direcElectron):
         
         #x=0 in, x=1 up
         
         
-        hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/Constants.fits')
+        #hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/Constants.fits')
 
 
-        nu =  hdu_c[0].header['nu']
-        mu = hdu_c[0].header['mu']
-        lam = hdu_c[0].header['lam']
-        GC = hdu_c[0].header['GC']
-        c = hdu_c[0].header['c']
+        #nu =  hdu_c[0].header['nu']
+        #mu = hdu_c[0].header['mu']
+        #lam = hdu_c[0].header['lam']
+        #GC = hdu_c[0].header['GC']
+        #c = hdu_c[0].header['c']
         
-        direcElectron = hdu_c[0].header['E_direc']
+        #direcElectron = hdu_c[0].header['E_direc']
 
 
         
@@ -560,20 +560,21 @@ class IfunctionsNoM:
         
         return (inte_e*self.coeff_no_m_even,inte_o*self.coeff_no_m_odd)#
         
-    def IBarplusplusfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points, F_points_xkh, G_points_xkh):
+    def IBarplusplusfunc(self,X,k,X_prime,k_prime,psi_gammalomega,psi_gammalomega_prime,l,h,h_prime,omega,M,r,r_points, F_points_xkh, G_points_xkh,nu,mu,lam,GC,c,direcElectron):
         
         #x=0 in, x=1 up
         
-        hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/Constants.fits')
+        #hdu_c = fits.open('/users/PCON0003/koivuemily/PrimordialBlackHole/Constants.fits')
 
 
-        nu =  hdu_c[0].header['nu']
-        mu = hdu_c[0].header['mu']
-        lam = hdu_c[0].header['lam']
-        GC = hdu_c[0].header['GC']
-        c = hdu_c[0].header['c']
+        #nu =  hdu_c[0].header['nu']
+        #mu = hdu_c[0].header['mu']
+        #lam = hdu_c[0].header['lam']
+        #GC = hdu_c[0].header['GC']
+        #c = hdu_c[0].header['c']
         
-        direcElectron = hdu_c[0].header['E_direc']
+        #direcElectron = hdu_c[0].header['E_direc']
+        #direcPhoton = hdu_c[0].header['P_direc']
 
         """
         #far from BH and then work towards that (up)
