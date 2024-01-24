@@ -6,8 +6,8 @@ omega = float(sys.argv[1])
 
 direc = 'Omega'+str(omega)+'T/'
 
-mp1 = ["InUpIn.pbs","InUpUp.pbs","UpInIn.pbs","UpInUp.pbs","UpUpIn.pbs","UpUpUp.pbs"]
-pp1 = ["InInIn.pbs","InInUp.pbs","UpInIn.pbs","UpInUp.pbs","UpUpIn.pbs","UpUpUp.pbs"]
+mp1 = ["InUpIn.txt","InUpUp.txt","UpInIn.txt","UpInUp.txt","UpUpIn.txt","UpUpUp.txt"]
+pp1 = ["InInIn.txt","InInUp.txt","UpInIn.txt","UpInUp.txt","UpUpIn.txt","UpUpUp.txt"]
 
 #os.chdir(direc)
 
