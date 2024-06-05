@@ -127,7 +127,6 @@ class ElectronWaveFunction:
         
         r_points = np.linspace(r_initial, r_final, N)        
         
-        print(r_points[0])
         #we need to specify the r_points for initial and final so that they match the F and G that come out! 
         
         #Define initial values for F and G
@@ -189,14 +188,11 @@ class ElectronWaveFunction:
                 # want this for rstar at negative infinity to get this
                 # rstar for up is from positive infinity to negative infinity so rstar negative infinity should be the last point
                 A = 2 * np.sqrt(self.h) * np.exp(complex(0,1)*self.h*r_points[-1])/ (F_points[-1]+ complex(0,1)*G_points[-1])
-                print(A)
 
                 #A* arijit's F and G = F_up and G_up from the paper
                 #use this to isolate T! then do a similar thing for up==False 
-                print("fpoints0 is "+str(F_points[0]))
                 F_points = A*np.array(F_points)
                 G_points = A*np.array(G_points)
-                print("fpoints0 normalized is "+str(F_points[0]))
 
             if up ==False:
 
@@ -210,19 +206,15 @@ class ElectronWaveFunction:
 
                 B = 2*self.h*np.sqrt(self.v)*np.exp(complex(0,-1)*zeta*np.log(r_points[-1]/2/self.M))*np.exp(complex(0,-1)*np.sqrt(self.h**2-self.mu**2)*r_points[-1])/(np.sqrt(self.h-self.mu)*F_points[-1] -complex(0,1)*np.sqrt(self.h+self.mu)*G_points[-1])
 
-                print(B)
                 F_points = B*np.array(F_points)
                 G_points = B*np.array(G_points)
                 
         if self.h<self.mu:
             if up ==True:
                 
-                print(F_points[0])
                 A = 2*complex(0,-1)*np.sqrt(self.h)*np.exp(complex(0,1)*self.h*r_points[-1])/(complex(0,-1)*F_points[-1]+G_points[-1])
-                print(A)
                 F_points = A*np.array(F_points)
                 G_points = A*np.array(G_points)
-            print(F_points[0])
                 
         return (r_points, F_points, G_points)
     
@@ -239,7 +231,6 @@ class ElectronWaveFunction:
             
             delta = complex(0,-1)*.5*np.log((complex(0,1)*F_points_up[-1]+G_points_up[-1])/(2*complex(0,1)*np.sqrt(self.h)*np.exp(complex(0,-1)*self.h*r_up[-1])))
             #match delta to small solution! 
-            print(delta)
         
         if self.h>self.mu:
             delta = 0 
@@ -251,8 +242,6 @@ class ElectronWaveFunction:
             c1=np.exp(complex(0,-1)*np.sqrt(self.h**2 -self.mu**2)*r_up[0])
             d1=1/(complex(0,-1)*np.sqrt(self.h-self.mu))
 
-            print(a1,b1,c1,d1)
-            print(self.v,zeta)
 
 
             T_half_k_h = a1*b1*c1*d1
@@ -266,9 +255,6 @@ class ElectronWaveFunction:
             b1=np.exp(complex(0,-1)*zeta*np.log(r_in[-1]/2/self.M))
             c1=np.exp(complex(0,-1)*np.sqrt(self.h**2 - self.mu**2)*r_in[-1])
             d1=1/2/self.h/np.sqrt(self.v)
-            #print(a1,b1,c1,d1)
-            #print(a1*b1,c1*d1)
-            #print(a1*b1*c1,d1)
 
             R_half_k_h = a1*b1*c1*d1
 
@@ -356,32 +342,20 @@ class PhotonWaveFunction:
             #evaluated at rstar -> neg infinity
             b = (2*np.complex(0,1)*self.omega*np.exp(np.complex(0,1)*self.omega*r_points[-1]) )/(f_points[-1]*np.complex(0,1)*self.omega + z_points[-1])
             
-            print("fpoints0 is " + str(f_points[0]))
-            print('normalized using rup neg infinity:' + str(r_points[-1]))
-            print(b) 
-            
             f_points = b*np.array(f_points)
             z_points = b*np.array(z_points)
             #f_points_prime = b*np.array(f_points_prime)
             
-            print("fpoints0 renormalized is " + str(f_points[0]))
-        
         
         if up == False:
             
             #evaluated at rstar -> infinity
             a = (2*np.complex(0,-1)*self.omega*np.exp(np.complex(0,-1)*self.omega*r_points[-1]))/(f_points[-1]*np.complex(0,-1)*self.omega + z_points[-1])
             
-            print("fpoints0 is " + str(f_points[0]))
-            print('is this rstar infinity: ' + str(r_points[-1]))
-            print(a)
-            
             f_points = a*np.array(f_points)
             z_points = a*np.array(z_points)
             #f_points_prime = a*np.array(f_points_prime)
             
-            print("fpoints0 renormalized is " + str(f_points[0]))
-    
         return(r_points, f_points, z_points, f_points_prime)
     
     def get_R_and_T_coeff(self,r_up,F_points_up,F_points_up_prime,r_in,F_points_in,F_points_in_prime):
@@ -389,18 +363,10 @@ class PhotonWaveFunction:
         T = F_points_up[0]*np.exp(np.complex(0,-1)*self.omega*r_up[0])
         
         T2 = F_points_in[0]*np.exp(np.complex(0,1)*self.omega*r_in[0])
-        print("rin negative infinity" + str(r_in[0])) 
-        
-        print('compare T:' +  str((np.abs(T)**2, np.abs(T2)**2)))
-        print("rstar up used " + str(r_up[0]))
         
         R = (np.complex(0,1)*self.omega*F_points_in[-1] + F_points_in_prime[-1])/(2*np.complex(0,1)*self.omega*np.exp(np.complex(0,1)*self.omega*r_in[-1]))
-        #print("rstar in used " + str(r_in[-1]))
         
         #R = (np.complex(0,-1)*self.omega*F_points_up[-1] + F_points_up_prime[-1]) / (2*np.complex(0,1)*self.omega* np.exp(np.complex(0,-1)*self.omega*r_up[-1])*(1+2*np.complex(0,1)*cmath.phase(T))) #bad!!!
-        
-        print("t phase is " + str(cmath.phase(T)))
-        print("rstar used :" +str(r_up[-1]))
         
         return R,T
 
@@ -434,8 +400,6 @@ class IfunctionsNoM:
         self.h_index = round(self.h*100*(8*np.pi*self.M) )
         self.h_prime_index = round(self.h_prime*100*(8*np.pi*self.M) )
     
-        #print(self.coeff_no_m_odd)
-   
     
     def Delta_no_m(self,k,k_prime,l):
         s=0
@@ -451,7 +415,6 @@ class IfunctionsNoM:
         j_prime = (np.abs(k_prime) - 1/2)
         
         threej=float(wigner_3j(j,j_prime,l,1/2,-1/2,0))
-        #print(threej)
         
         x=(1/2) * np.sqrt((2*j+1)*(2*j_prime +1)*(2*l+1)/(4*np.pi))*threej* (1 + s*s_prime*(-1)**(j-j_prime+l))
 
@@ -473,9 +436,6 @@ class IfunctionsNoM:
         
         
         w= float(wigner_3j(j,j_prime,l,-1/2,-1/2,1))
-        #print(s,s_prime,j,j_prime)
-        #print(np.sqrt((2*j+1)*(2*j_prime+1)*(2*l+1)/(4*np.pi)))
-        #print((1-s*s_prime*(-1)**(j-j_prime+l))) #gives 0
         x = s*np.sqrt((2*j+1)*(2*j_prime+1)*(2*l+1)/(4*np.pi))*w*(1-s*s_prime*(-1)**(j-j_prime+l))
         
         return x
@@ -527,11 +487,6 @@ class IfunctionsNoM:
             G_points_xminkh_prime = hdu[self.h_prime_index]['G_points_in'][:]
         #time2 = time.time()
         hdu.close()
-        #print('Time diff is ' + str(time2-time1))
-        #print(F_points_xminkh_prime)
-        #F_points_xminkh_prime = data[0]
-        #G_points_xminkh_prime = data[1]
-     
         
         g_xminkh = np.array(G_points_xminkh)
         gstar_xprime_minkprime_hprime = np.conjugate(np.array(G_points_xminkh_prime))
@@ -682,12 +637,6 @@ class IfunctionsNoM:
         rdependentpart_top = (1-2*M/r)/(r**2*np.sqrt(2*omega**3))
         rdependentpart_bottom = np.sqrt(1-2*M/r)/(r*np.sqrt(2*omega))
         
-        
-        #print(gstar_xkh,fstar_xkh,psi_gammalomega,rdependentpart_top,rdependentpart_bottom)
-        #print(r_points[0],r_points_gamma[0])
-        
-        #print(np.dot(gstar_xkh[0],gstar_xprime_minkprime_hprime[0]))
-        #print(fstar_xkh*fstar_xprime_minkprime_hprime)
         
         topline = (-1*gstar_xkh*gstar_xprime_minkprime_hprime + fstar_xkh*fstar_xprime_minkprime_hprime)*np.sqrt(l*(l+1))*psi_gammalomega*rdependentpart_top
            

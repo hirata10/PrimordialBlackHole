@@ -45,23 +45,27 @@ for x in range(0,2000,int(sys.argv[3])):
     if h[x]>mu:
         v = np.sqrt(h[x]**2-mu**2)/h[x]
         print('^', x, h[x], mu, v)
+        Gamma = 0.
         for k in list(range(-kmax,0))+list(range(1,kmax+1)):
             EWF = Inp.ElectronWaveFunction(nu, h[x], k, mu, M, lam, GC, c, tol)
             r_points, F_points, G_points = EWF.RK_4(r_initial, r_final, 240000, up = True)
             r_points_in, F_points_in, G_points_in = EWF.RK_4(r_final, r_initial, 240000, up = False)
             R,T,delta = EWF.get_R_and_T_coeff(r_points,F_points,G_points,r_points_in,F_points_in,G_points_in)
-        Gamma = 2*np.abs(k)*np.abs(T)**2/(1+np.exp(h[x]/Temp))
+            Gamma += 2*np.abs(k)*np.abs(T)**2/(1+np.exp(h[x]/Temp))
+            sys.stdout.flush()
         for L in range(1,lmax+1):
             a = ampcorr(xi_,L)
             thisfrac, integrand = frac_I(xi_,L,v)
             totEm[L] += np.abs(integrand)**2*Gamma*v**2
             cutEm[L] += np.abs(integrand)**2*Gamma*v**2*np.abs(thisfrac)**2/a
             print(':', L, np.abs(thisfrac)**2/a)
+            sys.stdout.flush()
 
         print('>>> {:4d} {:6.4f} {:6.4f} {:12.5E}'.format(x, h[x]/Temp, v, Gamma))
         print(totEm)
         print(cutEm)
         print('')
+        sys.stdout.flush()
 
 print('# M =', M)
 print('# omega/Temp =', omega/Temp)
