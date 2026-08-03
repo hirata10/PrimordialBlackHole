@@ -1,5 +1,5 @@
-This folder contains the files with the transmission coefficient data to be used to determine b0 and b1 terms for the
-stochastic charge project, besides for the principal part integral in b0 (which is done with another code).  
+This folder contains the files with the transmission coefficient data to be used to determine $B_0$ and $B_1$ terms for the
+stochastic charge project. It also contains the output files from the code that does the principal part integrals used to determine the $t_{08}$ and $t_{09}$ contributions to $B_0$.
   
 It contains data for the following masses:  
 1e21 Planck masses  
@@ -8,22 +8,14 @@ It contains data for the following masses:
 8e21 Planck masses  
   
 The parameters are as follows:  
-k=[-5,-4,-3,-2,-1,1,2,3,4,5]  
+k=[-5,-4,-3,-2,-1,1,2,3,4,5]  for transmission coefficient files
 Z=[-2,-1,0,1,2] (for Y=0)  
 Y=[-2,-1,0,1,2] (for Z=0)  
 rmax=10^6\*M where (M is the BH mass)  
 nstep=1.81\*10^6  
 e-folds=26.6  
-  
-For "non-fine" files:  
 dh=0.1\*TH (where TH is the Hawking temperature for each mass)  
 hnum=200  
-hmin=0.01\*TH  
-  
-For "fine" files:  
-dh=0.01\*TH  
-hnum=200  
-For M=1e21: hmin=0.01\*TH+10\*0.1\*TH  
-For M=2e21: hmin=0.01\*TH+20\*0.1\*TH  
-For M=4e21: hmin=0.01\*TH+41\*0.1\*TH  
-For M=8e21: hmin=0.01\*TH+83\*0.1*TH
+hmin=0.01\*TH 
+
+k=[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7,8,9,10] for principal part integral files   
