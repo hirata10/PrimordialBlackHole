@@ -8,7 +8,7 @@ It contains data for the following masses:
 8e21 Planck masses  
   
 The parameters are as follows:  
-k=[-5,-4,-3,-2,-1,1,2,3,4,5]  for transmission coefficient files
+k=[-5,-4,-3,-2,-1,1,2,3,4,5]
 Z=[-2,-1,0,1,2] (for Y=0)  
 Y=[-2,-1,0,1,2] (for Z=0)  
 rmax=10^6\*M where (M is the BH mass)  
